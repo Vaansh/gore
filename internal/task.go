@@ -1,12 +1,17 @@
-package main
+package internal
+
+import (
+	"pubsub/internal/consumers"
+	"pubsub/internal/producers"
+)
 
 type Task struct {
 	ID        string
-	Producers []Producer
-	Consumer  Consumer
+	Producers []producers.Producer
+	Consumer  consumers.Consumer
 }
 
-func NewTask(Id string, producers []Producer, consumer Consumer) *Task {
+func NewTask(Id string, producers []producers.Producer, consumer consumers.Consumer) *Task {
 	return &Task{
 		ID:        Id,
 		Producers: producers,

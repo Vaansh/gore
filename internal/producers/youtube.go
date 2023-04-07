@@ -1,30 +1,24 @@
-package main
+package producers
 
 import (
-	client2 "pubsub/pkg/client"
+	"pubsub/pkg/client"
 	"time"
 )
 
-type Producer interface {
-	ProduceOn(c chan<- string)
-	ProducerID() string
-}
-
 type YoutubeProducer struct {
 	ChannelID string
-	client    *client2.YoutubeClient
+	client    *client.YoutubeClient
 }
 
 func NewYoutubeProducer(channelID string) *YoutubeProducer {
 	return &YoutubeProducer{
 		ChannelID: channelID,
-		client:    client2.NewYoutubeClient(client2.ApiKey),
+		client:    client.NewYoutubeClient(client.ApiKey),
 	}
 }
 
 func (p *YoutubeProducer) ProduceOn(c chan<- string) {
 	videos := p.client.FetchVideosByChannel(p.ChannelID)
-
 	for _, link := range videos {
 		c <- link
 	}

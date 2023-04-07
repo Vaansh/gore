@@ -1,7 +1,9 @@
-package main
+package internal
 
 import (
 	"fmt"
+	"pubsub/internal/consumers"
+	"pubsub/internal/producers"
 	"sync"
 )
 
@@ -25,23 +27,23 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
 	}
 
-	producers := make([]Producer, len(producerIDs))
+	prods := make([]producers.Producer, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
 		case PLATFORM:
-			producers[i] = NewYoutubeProducer(id)
+			prods[i] = producers.NewYoutubeProducer(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}
 	}
 
-	consumer := NewInstagramConsumer(consumerID)
-	task := NewTask(taskID, producers, consumer)
+	consumer := consumers.NewInstagramConsumer(consumerID)
+	task := NewTask(taskID, prods, consumer)
 	tm.Tasks[task.ID] = task
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []Producer, consumer Consumer) error {
+func (tm *TaskManager) EditTask(taskID string, producers []producers.Producer, consumer consumers.Consumer) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("task %s not found", taskID)

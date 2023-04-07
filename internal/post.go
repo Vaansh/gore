@@ -1,22 +1,4 @@
-package main
-
-type PlatformName string
-
-const (
-	PLATFORM PlatformName = "PF"
-)
-
-type User struct {
-	ID           string
-	platformName PlatformName
-}
-
-func NewUser(id, platform string) *User {
-	return &User{
-		ID:           id,
-		platformName: PLATFORM,
-	}
-}
+package internal
 
 type Post struct {
 	ID, sourceLink       string

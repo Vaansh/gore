@@ -1,14 +1,9 @@
-package main
+package consumers
 
 import (
 	"fmt"
 	"time"
 )
-
-type Consumer interface {
-	ConsumeOn(c <-chan string)
-	ConsumerID() string
-}
 
 type InstagramConsumer struct {
 	InstagramID string
