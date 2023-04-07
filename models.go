@@ -3,22 +3,32 @@ package main
 type PlatformName string
 
 const (
-	INSTAGRAM PlatformName = "IG"
+	PLATFORM PlatformName = "PF"
 )
 
-type DestinationPost interface{}
-
-type InstagramPost struct {
-	ID, caption, author string
-	sourceLink          string
-	platformName        PlatformName
+type User struct {
+	ID           string
+	platformName PlatformName
 }
 
-func NewInstagramPost(id, caption, author string) InstagramPost {
-	return InstagramPost{
+func NewUser(id, platform string) *User {
+	return &User{
+		ID:           id,
+		platformName: PLATFORM,
+	}
+}
+
+type Post struct {
+	ID, sourceLink       string
+	tag, caption, author string
+	platformName         PlatformName
+}
+
+func NewPost(id, caption, author string) *Post {
+	return &Post{
 		ID:           id,
 		caption:      caption,
 		author:       author,
-		platformName: INSTAGRAM,
+		platformName: PLATFORM,
 	}
 }
