@@ -1,4 +1,4 @@
-package client
+package youtube
 
 import (
 	"encoding/json"

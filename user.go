@@ -1,8 +1,8 @@
-package internal
+package main
 
 type User struct {
 	ID           string
-	platformName PlatformName
+	platformName main.PlatformName
 }
 
 func NewUser(id, platform string) *User {

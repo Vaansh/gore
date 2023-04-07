@@ -1,19 +1,14 @@
 package main
 
-import (
-	"pubsub/internal"
-	"pubsub/internal/lifecycle"
-)
-
 func main() {
 	ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
-	tm := lifecycle.NewTaskManager()
+	tm := NewTaskManager()
 
 	channels := []string{ChannelID}
-	platforms := []internal.PlatformName{internal.PLATFORM}
+	platforms := []PlatformName{PLATFORM}
 
-	err := tm.AddTask(channels, platforms, "", internal.PLATFORM)
+	err := tm.AddTask(channels, platforms, "", PLATFORM)
 	if err != nil {
 		return
 	}

@@ -1,17 +1,12 @@
-package lifecycle
-
-import (
-	"pubsub/internal/publisher"
-	"pubsub/internal/subscriber"
-)
+package main
 
 type Task struct {
 	ID        string
-	Producers []publisher.Publisher
-	Consumer  subscriber.Subscriber
+	Producers []Publisher
+	Consumer  Subscriber
 }
 
-func NewTask(Id string, producers []publisher.Publisher, consumer subscriber.Subscriber) *Task {
+func NewTask(Id string, producers []Publisher, consumer Subscriber) *Task {
 	return &Task{
 		ID:        Id,
 		Producers: producers,

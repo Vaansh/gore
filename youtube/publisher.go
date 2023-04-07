@@ -1,31 +1,31 @@
-package publisher
+package youtube
 
 import (
-	"pubsub/pkg/client"
 	"time"
 )
 
-type YoutubeProducer struct {
+type YoutubePublisher struct {
 	ChannelID string
-	client    *client.YoutubeClient
+	client    *YoutubeClient
 }
 
-func NewYoutubeProducer(channelID string) *YoutubeProducer {
-	return &YoutubeProducer{
+func NewYoutubePublisher(channelID string) *YoutubePublisher {
+	return &YoutubePublisher{
 		ChannelID: channelID,
-		client:    client.NewYoutubeClient(client.ApiKey),
+		client:    NewYoutubeClient(ApiKey),
 	}
 }
 
-func (p *YoutubeProducer) PublishTo(c chan<- string) {
+func (p *YoutubePublisher) PublishTo(c chan<- string) {
+	//TODO: fetch 25 from client, move loop logic here instead
 	videos := p.client.FetchVideosByChannel(p.ChannelID)
+
 	for _, link := range videos {
 		c <- link
 	}
 
 	for {
 		latestVideoLink := p.client.FetchLatestVideoByChannel(p.ChannelID)
-
 		if !contains(videos, latestVideoLink) {
 			c <- latestVideoLink
 			videos = append(videos, latestVideoLink)
@@ -35,7 +35,7 @@ func (p *YoutubeProducer) PublishTo(c chan<- string) {
 	}
 }
 
-func (p *YoutubeProducer) GetPublisherID() string {
+func (p *YoutubePublisher) GetPublisherID() string {
 	return p.ChannelID
 }
 

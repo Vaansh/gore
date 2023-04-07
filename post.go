@@ -1,9 +1,9 @@
-package internal
+package main
 
 type Post struct {
 	ID, sourceLink       string
 	tag, caption, author string
-	platformName         PlatformName
+	platformName         main.PlatformName
 }
 
 func NewPost(id, caption, author string) *Post {
