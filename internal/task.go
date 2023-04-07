@@ -1,6 +1,8 @@
-package lifecycle
+package internal
 
-import "github.com/Vaansh/gore/internal/platform"
+import (
+	"github.com/Vaansh/gore/pkg/platform"
+)
 
 type Task struct {
 	ID         string

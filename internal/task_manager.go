@@ -1,10 +1,10 @@
-package lifecycle
+package internal
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/internal/platform"
-	"github.com/Vaansh/gore/internal/platform/instagram"
-	"github.com/Vaansh/gore/internal/platform/youtube"
+	platform2 "github.com/Vaansh/gore/pkg/platform"
+	"github.com/Vaansh/gore/pkg/platform/instagram"
+	"github.com/Vaansh/gore/pkg/platform/youtube"
 	"sync"
 )
 
@@ -31,7 +31,7 @@ func (tm *TaskManager) RunAll() {
 	wg.Wait()
 }
 
-func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.PlatformName, consumerID string, destination platform.PlatformName) error {
+func (tm *TaskManager) AddTask(producerIDs []string, sources []platform2.PlatformName, consumerID string, destination platform2.PlatformName) error {
 	taskID := string(destination) + consumerID
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("task with ID %s already exists", taskID)
@@ -41,10 +41,10 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Platform
 		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
 	}
 
-	prods := make([]platform.Publisher, len(producerIDs))
+	prods := make([]platform2.Publisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
-		case platform.PLATFORM:
+		case platform2.PLATFORM:
 			prods[i] = youtube.NewPublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
@@ -57,7 +57,7 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Platform
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []platform.Publisher, consumer platform.Subscriber) error {
+func (tm *TaskManager) EditTask(taskID string, producers []platform2.Publisher, consumer platform2.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("task %s not found", taskID)
