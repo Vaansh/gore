@@ -1,14 +1,19 @@
 package main
 
+import (
+	"pubsub/internal"
+	"pubsub/internal/platform"
+)
+
 func main() {
 	ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
-	tm := NewTaskManager()
+	tm := internal.NewTaskManager()
 
 	channels := []string{ChannelID}
-	platforms := []PlatformName{PLATFORM}
+	platforms := []platform.PlatformName{platform.PLATFORM}
 
-	err := tm.AddTask(channels, platforms, "", PLATFORM)
+	err := tm.AddTask(channels, platforms, "", platform.PLATFORM)
 	if err != nil {
 		return
 	}

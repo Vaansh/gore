@@ -12,19 +12,19 @@ const (
 	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
 )
 
-type YoutubeClient struct {
+type Client struct {
 	c      *http.Client
 	apiKey string
 }
 
-func NewYoutubeClient(apiKey string) *YoutubeClient {
-	return &YoutubeClient{
+func NewClient(apiKey string) *Client {
+	return &Client{
 		c:      &http.Client{},
 		apiKey: apiKey,
 	}
 }
 
-func (c *YoutubeClient) FetchVideosByChannel(channelID string) []string {
+func (c *Client) FetchVideosByChannel(channelID string) []string {
 	firstURL := YoutubePaginatedVideosURL(channelID)
 	fmt.Println(firstURL)
 
@@ -69,7 +69,7 @@ func (c *YoutubeClient) FetchVideosByChannel(channelID string) []string {
 	return videoLinks
 }
 
-func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) string {
+func (c *Client) FetchLatestVideoByChannel(channelID string) string {
 	paginatedVideos := YoutubePaginatedVideosURL(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {

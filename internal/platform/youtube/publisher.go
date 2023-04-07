@@ -4,19 +4,19 @@ import (
 	"time"
 )
 
-type YoutubePublisher struct {
+type Publisher struct {
 	ChannelID string
-	client    *YoutubeClient
+	client    *Client
 }
 
-func NewYoutubePublisher(channelID string) *YoutubePublisher {
-	return &YoutubePublisher{
+func NewYoutubePublisher(channelID string) *Publisher {
+	return &Publisher{
 		ChannelID: channelID,
-		client:    NewYoutubeClient(ApiKey),
+		client:    NewClient(ApiKey),
 	}
 }
 
-func (p *YoutubePublisher) PublishTo(c chan<- string) {
+func (p *Publisher) PublishTo(c chan<- string) {
 	//TODO: fetch 25 from client, move loop logic here instead
 	videos := p.client.FetchVideosByChannel(p.ChannelID)
 
@@ -35,7 +35,7 @@ func (p *YoutubePublisher) PublishTo(c chan<- string) {
 	}
 }
 
-func (p *YoutubePublisher) GetPublisherID() string {
+func (p *Publisher) GetPublisherID() string {
 	return p.ChannelID
 }
 
