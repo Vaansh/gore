@@ -9,7 +9,7 @@ type Publisher struct {
 	client    *Client
 }
 
-func NewYoutubePublisher(channelID string) *Publisher {
+func NewPublisher(channelID string) *Publisher {
 	return &Publisher{
 		ChannelID: channelID,
 		client:    NewClient(ApiKey),

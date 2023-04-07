@@ -1,10 +1,10 @@
-package internal
+package lifecycle
 
 import (
 	"fmt"
-	"pubsub/internal/platform"
-	"pubsub/internal/platform/instagram"
-	"pubsub/internal/platform/youtube"
+	"github.com/Vaansh/gore/internal/platform"
+	"github.com/Vaansh/gore/internal/platform/instagram"
+	"github.com/Vaansh/gore/internal/platform/youtube"
 	"sync"
 )
 
@@ -16,6 +16,19 @@ func NewTaskManager() *TaskManager {
 	return &TaskManager{
 		Tasks: make(map[string]*Task),
 	}
+}
+
+func (tm *TaskManager) RunAll() {
+	var wg sync.WaitGroup
+	for _, task := range tm.Tasks {
+		wg.Add(1)
+		go func(t *Task) {
+			defer wg.Done()
+			t.Run()
+			select {}
+		}(task)
+	}
+	wg.Wait()
 }
 
 func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.PlatformName, consumerID string, destination platform.PlatformName) error {
@@ -32,13 +45,13 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Platform
 	for i, id := range producerIDs {
 		switch sources[i] {
 		case platform.PLATFORM:
-			prods[i] = youtube.NewYoutubePublisher(id)
+			prods[i] = youtube.NewPublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}
 	}
 
-	consumer := instagram.NewInstagramSubscriber(consumerID)
+	consumer := instagram.NewSubscriber(consumerID)
 	task := NewTask(taskID, prods, consumer)
 	tm.Tasks[task.ID] = task
 	return nil
@@ -56,17 +69,4 @@ func (tm *TaskManager) EditTask(taskID string, producers []platform.Publisher, c
 
 func (tm *TaskManager) DeleteTask(taskID string) {
 	delete(tm.Tasks, taskID)
-}
-
-func (tm *TaskManager) RunAll() {
-	var wg sync.WaitGroup
-	for _, task := range tm.Tasks {
-		wg.Add(1)
-		go func(t *Task) {
-			defer wg.Done()
-			t.Run()
-			select {}
-		}(task)
-	}
-	wg.Wait()
 }

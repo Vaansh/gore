@@ -1,14 +1,14 @@
 package main
 
 import (
-	"pubsub/internal"
-	"pubsub/internal/platform"
+	"github.com/Vaansh/gore/internal/lifecycle"
+	"github.com/Vaansh/gore/internal/platform"
 )
 
 func main() {
 	ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
-	tm := internal.NewTaskManager()
+	tm := lifecycle.NewTaskManager()
 
 	channels := []string{ChannelID}
 	platforms := []platform.PlatformName{platform.PLATFORM}

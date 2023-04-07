@@ -25,7 +25,7 @@ func NewClient(apiKey string) *Client {
 }
 
 func (c *Client) FetchVideosByChannel(channelID string) []string {
-	firstURL := YoutubePaginatedVideosURL(channelID)
+	firstURL := PaginatedUploadsURL(channelID)
 	fmt.Println(firstURL)
 
 	var videoLinks []string
@@ -55,7 +55,7 @@ func (c *Client) FetchVideosByChannel(channelID string) []string {
 			itemMap := item.(map[string]interface{})
 			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
 				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
-				videoLinks = append(videoLinks, YoutubeWatchURL(videoID).String())
+				videoLinks = append(videoLinks, MostRecentUploadURL(videoID).String())
 			}
 		}
 
@@ -70,7 +70,7 @@ func (c *Client) FetchVideosByChannel(channelID string) []string {
 }
 
 func (c *Client) FetchLatestVideoByChannel(channelID string) string {
-	paginatedVideos := YoutubePaginatedVideosURL(channelID)
+	paginatedVideos := PaginatedUploadsURL(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
 		fmt.Println(err)
@@ -95,10 +95,10 @@ func (c *Client) FetchLatestVideoByChannel(channelID string) string {
 	itemMap := item.(map[string]interface{})
 	videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
 
-	return YoutubeWatchURL(videoID).String()
+	return MostRecentUploadURL(videoID).String()
 }
 
-func YoutubeWatchURL(videoID string) *url.URL {
+func MostRecentUploadURL(videoID string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.youtube.com",
@@ -108,7 +108,7 @@ func YoutubeWatchURL(videoID string) *url.URL {
 	}
 }
 
-func YoutubePaginatedVideosURL(channelId string) *url.URL {
+func PaginatedUploadsURL(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",
