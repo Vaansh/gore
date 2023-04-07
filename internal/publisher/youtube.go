@@ -1,4 +1,4 @@
-package producers
+package publisher
 
 import (
 	"pubsub/pkg/client"
@@ -17,7 +17,7 @@ func NewYoutubeProducer(channelID string) *YoutubeProducer {
 	}
 }
 
-func (p *YoutubeProducer) ProduceOn(c chan<- string) {
+func (p *YoutubeProducer) PublishTo(c chan<- string) {
 	videos := p.client.FetchVideosByChannel(p.ChannelID)
 	for _, link := range videos {
 		c <- link
@@ -35,7 +35,7 @@ func (p *YoutubeProducer) ProduceOn(c chan<- string) {
 	}
 }
 
-func (p *YoutubeProducer) ProducerID() string {
+func (p *YoutubeProducer) GetPublisherID() string {
 	return p.ChannelID
 }
 

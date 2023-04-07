@@ -1,9 +1,10 @@
-package internal
+package lifecycle
 
 import (
 	"fmt"
-	"pubsub/internal/consumers"
-	"pubsub/internal/producers"
+	"pubsub/internal"
+	"pubsub/internal/publisher"
+	"pubsub/internal/subscriber"
 	"sync"
 )
 
@@ -17,7 +18,7 @@ func NewTaskManager() *TaskManager {
 	}
 }
 
-func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, consumerID string, destination PlatformName) error {
+func (tm *TaskManager) AddTask(producerIDs []string, sources []internal.PlatformName, consumerID string, destination internal.PlatformName) error {
 	taskID := string(destination) + consumerID
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("task with ID %s already exists", taskID)
@@ -27,23 +28,23 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
 	}
 
-	prods := make([]producers.Producer, len(producerIDs))
+	prods := make([]publisher.Publisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
-		case PLATFORM:
-			prods[i] = producers.NewYoutubeProducer(id)
+		case internal.PLATFORM:
+			prods[i] = publisher.NewYoutubeProducer(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}
 	}
 
-	consumer := consumers.NewInstagramConsumer(consumerID)
+	consumer := subscriber.NewInstagramConsumer(consumerID)
 	task := NewTask(taskID, prods, consumer)
 	tm.Tasks[task.ID] = task
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []producers.Producer, consumer consumers.Consumer) error {
+func (tm *TaskManager) EditTask(taskID string, producers []publisher.Publisher, consumer subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("task %s not found", taskID)
