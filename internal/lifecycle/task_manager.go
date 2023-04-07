@@ -2,6 +2,7 @@ package lifecycle
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/pkg"
 	platform2 "github.com/Vaansh/gore/pkg/platform"
 	"github.com/Vaansh/gore/pkg/platform/instagram"
 	"github.com/Vaansh/gore/pkg/platform/youtube"
@@ -31,7 +32,7 @@ func (tm *TaskManager) RunAll() {
 	wg.Wait()
 }
 
-func (tm *TaskManager) AddTask(producerIDs []string, sources []platform2.PlatformName, consumerID string, destination platform2.PlatformName) error {
+func (tm *TaskManager) AddTask(producerIDs []string, sources []pkg.PlatformName, consumerID string, destination pkg.PlatformName) error {
 	taskID := string(destination) + consumerID
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("task with ID %s already exists", taskID)
@@ -44,7 +45,7 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform2.Platfor
 	prods := make([]platform2.Publisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
-		case platform2.PLATFORM:
+		case pkg.PLATFORM:
 			prods[i] = youtube.NewPublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)

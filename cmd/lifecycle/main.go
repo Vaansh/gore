@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Vaansh/gore/internal/lifecycle"
-	"github.com/Vaansh/gore/pkg/platform"
+	"github.com/Vaansh/gore/pkg"
 )
 
 func main() {
@@ -11,9 +11,9 @@ func main() {
 	tm := lifecycle.NewTaskManager()
 
 	channels := []string{ChannelID}
-	platforms := []platform.PlatformName{platform.PLATFORM}
+	platforms := []pkg.PlatformName{pkg.PLATFORM}
 
-	err := tm.AddTask(channels, platforms, "", platform.PLATFORM)
+	err := tm.AddTask(channels, platforms, "", pkg.PLATFORM)
 	if err != nil {
 		return
 	}
