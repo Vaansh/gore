@@ -1,4 +1,4 @@
-package lifecycle
+package internal
 
 import (
 	"github.com/Vaansh/gore/pkg/platform"

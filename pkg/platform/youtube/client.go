@@ -24,53 +24,30 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
-func (c *Client) FetchVideosByChannel(channelID string) []string {
-	firstURL := PaginatedUploadsURL(channelID)
-	fmt.Println(firstURL)
-
-	var videoLinks []string
-	videoURL := firstURL.String()
-	for {
-		resp, err := http.Get(videoURL)
-		if err != nil {
-			fmt.Println(err)
-			break
-		}
-
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-
-			}
-		}(resp.Body)
-
-		var data map[string]interface{}
-		err = json.NewDecoder(resp.Body).Decode(&data)
-		if err != nil {
-			fmt.Println(err)
-			break
-		}
-
-		for _, item := range data["items"].([]interface{}) {
-			itemMap := item.(map[string]interface{})
-			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
-				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
-				videoLinks = append(videoLinks, MostRecentUploadURL(videoID).String())
-			}
-		}
-
-		if nextPageToken, ok := data["nextPageToken"].(string); ok {
-			videoURL = fmt.Sprintf("%s&pageToken=%s", firstURL, nextPageToken)
-		} else {
-			break
-		}
+func (c *Client) FetchVideo(videoURL string) (map[string]interface{}, error) {
+	resp, err := http.Get(videoURL)
+	if err != nil {
+		return nil, err
 	}
 
-	return videoLinks
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
+
+	var data map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (c *Client) FetchLatestVideoByChannel(channelID string) string {
-	paginatedVideos := PaginatedUploadsURL(channelID)
+	paginatedVideos := PaginatedVideosAPI(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
 		fmt.Println(err)
@@ -95,10 +72,10 @@ func (c *Client) FetchLatestVideoByChannel(channelID string) string {
 	itemMap := item.(map[string]interface{})
 	videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
 
-	return MostRecentUploadURL(videoID).String()
+	return WatchVideoURL(videoID).String()
 }
 
-func MostRecentUploadURL(videoID string) *url.URL {
+func WatchVideoURL(videoID string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.youtube.com",
@@ -108,7 +85,7 @@ func MostRecentUploadURL(videoID string) *url.URL {
 	}
 }
 
-func PaginatedUploadsURL(channelId string) *url.URL {
+func PaginatedVideosAPI(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",

@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -17,18 +18,45 @@ func NewPublisher(channelID string) *Publisher {
 }
 
 func (p *Publisher) PublishTo(c chan<- string) {
-	//TODO: fetch 25 from client, move loop logic here instead
-	videos := p.client.FetchVideosByChannel(p.ChannelID)
+	firstURL := PaginatedVideosAPI(p.ChannelID)
+	fmt.Println(firstURL)
 
-	for _, link := range videos {
-		c <- link
+	videoURL := firstURL.String()
+	for {
+		data, err := p.client.FetchVideo(videoURL)
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+
+		for _, item := range data["items"].([]interface{}) {
+			itemMap := item.(map[string]interface{})
+			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
+				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
+				videoLink := WatchVideoURL(videoID).String()
+				c <- videoLink
+			}
+		}
+
+		if nextPageToken, ok := data["nextPageToken"].(string); ok {
+			videoURL = fmt.Sprintf("%s&pageToken=%s", firstURL, nextPageToken)
+		} else {
+			break
+		}
+
+		time.Sleep(3 * time.Hour)
 	}
 
+	var videosBuffer []string
 	for {
-		latestVideoLink := p.client.FetchLatestVideoByChannel(p.ChannelID)
-		if !contains(videos, latestVideoLink) {
-			c <- latestVideoLink
-			videos = append(videos, latestVideoLink)
+		mostRecentUpload := p.client.FetchLatestVideoByChannel(p.ChannelID)
+		if !contains(videosBuffer, mostRecentUpload) {
+			c <- mostRecentUpload
+			videosBuffer = append(videosBuffer, mostRecentUpload)
+		}
+
+		if len(videosBuffer) == 50 {
+			videosBuffer = make([]string, 0)
 		}
 
 		time.Sleep(3 * time.Hour)
