@@ -13,7 +13,7 @@ const (
 )
 
 type Client struct {
-	c      *http.Client
+	c      *http.Client // query client
 	apiKey string
 }
 
