@@ -33,8 +33,7 @@ func (p *Publisher) PublishTo(c chan<- string) {
 			itemMap := item.(map[string]interface{})
 			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
 				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
-				videoLink := WatchVideoURL(videoID).String()
-				c <- videoLink
+				c <- videoID
 			}
 		}
 
@@ -49,7 +48,11 @@ func (p *Publisher) PublishTo(c chan<- string) {
 
 	var videosBuffer []string
 	for {
-		mostRecentUpload := p.client.FetchLatestVideoByChannel(p.ChannelID)
+		mostRecentUpload, err := p.client.FetchLatestVideoByChannel(p.ChannelID)
+
+		if err != nil {
+		}
+
 		if !contains(videosBuffer, mostRecentUpload) {
 			c <- mostRecentUpload
 			videosBuffer = append(videosBuffer, mostRecentUpload)

@@ -25,6 +25,4 @@ _testmain.go
 /doc/articles/wiki/*.bin
 /goinstall.log
 /last-change
-/misc/cgo/life/run.out
-/misc/cgo/stdio/run.out
-/misc/cgo/testso/main
+misc/**

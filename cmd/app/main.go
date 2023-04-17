@@ -1,12 +1,25 @@
 package main
 
 import (
-	"github.com/kkdai/youtube/v2"
-	"io"
-	"os"
+	"fmt"
+	"github.com/Vaansh/gore/pkg/platform/youtube"
+)
+
+const (
+	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
 )
 
 func main() {
+	c := youtube.Client{}
+
+	//if name, err := c.FetchChannelName("UCfeMEuhdUtxtaUMNSvxq_Xg"); err == nil {
+	//	fmt.Println(name)
+	//}
+
+	if name, err := c.FetchShortsByChannel("UC5O114-PQNYkurlTg6hekZw"); err == nil {
+		fmt.Println(name)
+	}
+
 	//ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
 	//tm := app.NewTaskManager()
@@ -21,48 +34,70 @@ func main() {
 	//
 	//tm.RunAll()
 
-	//insta := goinsta.New("USERNAME", "PASSWORD")
+	//videoID := "dCcuIFO_SF8"
+	//client := ytdownloader.Client{}
 	//
-	//// Only call Login the first time you login. Next time import your config
+	//videoLink, err := client.GetVideo(videoID)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//formats := videoLink.Formats.WithAudioChannels()
+	//stream, _, err := client.GetStream(videoLink, &formats[0])
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//file, err := os.Create("video.mp4")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer file.Close()
+	//
+	//_, err = io.Copy(file, stream)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//insta := goinsta.New("mrbeast.zip", "")
+	//
 	//if err := insta.Login(); err != nil {
 	//	panic(err)
 	//}
 	//
-	//item, err := insta.Upload(
-	//	&goinsta.UploadOptions{
-	//		File:    videoFile,
-	//		Caption: "awesome! :)",
-	//	},
-	//)
-
-	videoID := "dCcuIFO_SF8"
-	client := youtube.Client{}
-
-	video, err := client.GetVideo(videoID)
-	if err != nil {
-		panic(err)
-	}
-
-	formats := video.Formats.WithAudioChannels()
-	stream, _, err := client.GetStream(video, &formats[0])
-	if err != nil {
-		panic(err)
-	}
-
-	file, err := os.Create("video.mp4")
-	if err != nil {
-		panic(err)
-	}
-
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-
-		}
-	}(file)
-
-	_, err = io.Copy(file, stream)
-	if err != nil {
-		panic(err)
-	}
+	//file, err = os.Open("video.mp4")
+	//
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//defer file.Close()
+	//
+	//reader := io.Reader(file)
+	//
+	//video, err := io.ReadAll(reader)
+	//if err != nil {
+	//	return // err
+	//}
+	//
+	//var following = insta.Account.Following("", goinsta.DefaultOrder)
+	//
+	//_, err = insta.Upload(&goinsta.UploadOptions{
+	//	File:    bytes.NewReader(video),
+	//	Caption: "capt",
+	//})
+	//
+	//if err != nil {
+	//	return
+	//}
+	//
+	//fmt.Println(len(following.Users))
 }
+
+//Mindc-blowing stunts and insane challenges 🤯
+//
+//Follow @mrbeast.reels for non-stop action 🔥
+//
+//Credit: @originalposter 💯
+//
+//#mrbeast #beastgang #reels #challengeaccepted
