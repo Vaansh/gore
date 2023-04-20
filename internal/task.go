@@ -1,16 +1,16 @@
 package internal
 
 import (
-	"github.com/Vaansh/gore/pkg/platform"
+	platform2 "github.com/Vaansh/gore/internal/platform"
 )
 
 type Task struct {
 	ID         string
-	Producers  []platform.Publisher
-	Subscriber platform.Subscriber
+	Producers  []platform2.Publisher
+	Subscriber platform2.Subscriber
 }
 
-func NewTask(Id string, producers []platform.Publisher, subscriber platform.Subscriber) *Task {
+func NewTask(Id string, producers []platform2.Publisher, subscriber platform2.Subscriber) *Task {
 	return &Task{
 		ID:         Id,
 		Producers:  producers,

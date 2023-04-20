@@ -1,15 +1,15 @@
 package model
 
 import (
-	"github.com/Vaansh/gore/pkg"
+	"github.com/Vaansh/gore/internal"
 )
 
 type User struct {
 	ID           string
-	platformName pkg.PlatformName
+	platformName internal.PlatformName
 }
 
-func NewUser(ID string, platform pkg.PlatformName) *User {
+func NewUser(ID string, platform internal.PlatformName) *User {
 	return &User{
 		ID:           ID,
 		platformName: platform,

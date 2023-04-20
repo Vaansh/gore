@@ -2,13 +2,10 @@ package youtube
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
-)
-
-const (
-	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
 )
 
 type ChannelShortsListResponse struct {
@@ -33,17 +30,16 @@ type ChannelShortsListResponse struct {
 }
 
 type Client struct {
-	client *http.Client
 	apiKey string
 }
 
 func NewClient(apiKey string) *Client {
 	return &Client{
-		client: &http.Client{},
-		apiKey: apiKey,
+		apiKey: "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU",
 	}
 }
 
+// Videos
 func (c *Client) FetchVideo(videoURL string) (map[string]interface{}, error) {
 	resp, err := http.Get(videoURL)
 	if err != nil {
@@ -62,7 +58,7 @@ func (c *Client) FetchVideo(videoURL string) (map[string]interface{}, error) {
 }
 
 func (c *Client) FetchLatestVideoByChannel(channelID string) (string, error) {
-	paginatedVideos := PaginatedVideosAPI(channelID)
+	paginatedVideos := c.PaginatedVideosAPI(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
 		fmt.Println(err)
@@ -85,7 +81,33 @@ func (c *Client) FetchLatestVideoByChannel(channelID string) (string, error) {
 	return videoID, nil
 }
 
-func (c *Client) FetchShortsByChannel(channelId string) ([]string, string, error) {
+// Shorts
+func (c *Client) FetchLatestShortByChannel(channelId string) (string, error) {
+	paginatedShorts := PaginatedShortsAPI(channelId)
+	fmt.Println(paginatedShorts)
+	resp, err := http.Get(paginatedShorts.String())
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	defer resp.Body.Close()
+
+	var response ChannelShortsListResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	if len(response.Items) < 1 || len(response.Items[0].Shorts) < 1 {
+		return "", errors.New("invalid response")
+	}
+
+	return response.Items[0].Shorts[0].VideoID, nil
+}
+
+func (c *Client) FetchPaginatedShortsByChannel(channelId string) ([]string, string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
 	fmt.Println(paginatedShorts)
 	resp, err := http.Get(paginatedShorts.String())
@@ -96,8 +118,9 @@ func (c *Client) FetchShortsByChannel(channelId string) ([]string, string, error
 
 	defer resp.Body.Close()
 
-	var data ChannelShortsListResponse
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	var response ChannelShortsListResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
 		fmt.Println(err)
 		return nil, "", err
 	}
@@ -105,7 +128,7 @@ func (c *Client) FetchShortsByChannel(channelId string) ([]string, string, error
 	var videoIds []string
 	var nextPageToken string
 
-	for _, item := range data.Items {
+	for _, item := range response.Items {
 		for _, short := range item.Shorts {
 			videoIds = append(videoIds, short.VideoID)
 		}
@@ -115,8 +138,9 @@ func (c *Client) FetchShortsByChannel(channelId string) ([]string, string, error
 	return videoIds, nextPageToken, nil
 }
 
+// Channels
 func (c *Client) FetchChannelName(channelId string) (string, error) {
-	paginatedVideos := ChannelInfoAPI(channelId)
+	paginatedVideos := c.ChannelInfoAPI(channelId)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
 		return "", err
@@ -136,23 +160,23 @@ func (c *Client) FetchChannelName(channelId string) (string, error) {
 	return channelName, nil
 }
 
-func PaginatedVideosAPI(channelId string) *url.URL {
+func (c *Client) PaginatedVideosAPI(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",
 		Path:       "/youtube/v3/search",
 		ForceQuery: true,
-		RawQuery:   fmt.Sprintf("key=%s&channelId=%s&part=snippet,id&order=date&maxResults=25", ApiKey, channelId),
+		RawQuery:   fmt.Sprintf("key=%s&channelId=%s&part=snippet,id&order=date&maxResults=25&type=video", c.apiKey, channelId),
 	}
 }
 
-func ChannelInfoAPI(channelId string) *url.URL {
+func (c *Client) ChannelInfoAPI(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",
 		Path:       "/youtube/v3/channels",
 		ForceQuery: true,
-		RawQuery:   fmt.Sprintf("key=%s&id=%s&part=snippet,id", ApiKey, channelId),
+		RawQuery:   fmt.Sprintf("key=%s&id=%s&part=snippet,id", c.apiKey, channelId),
 	}
 }
 
@@ -162,6 +186,6 @@ func PaginatedShortsAPI(videoId string) *url.URL {
 		Host:       "yt.lemnoslife.com",
 		Path:       "channels",
 		ForceQuery: true,
-		RawQuery:   fmt.Sprintf("part=shorts&id=%s", videoId),
+		RawQuery:   fmt.Sprintf("part=shorts&id=%s&order=date", videoId),
 	}
 }

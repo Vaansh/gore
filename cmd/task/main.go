@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/pkg/platform/youtube"
+	"github.com/Vaansh/gore/internal/platform/youtube"
 )
 
 const (
@@ -10,19 +10,24 @@ const (
 )
 
 func main() {
-	c := youtube.Client{}
+	c := youtube.NewClient(ApiKey)
 
 	//if name, err := c.FetchChannelName("UCfeMEuhdUtxtaUMNSvxq_Xg"); err == nil {
 	//	fmt.Println(name)
 	//}
 
-	if name, err := c.FetchShortsByChannel("UC5O114-PQNYkurlTg6hekZw"); err == nil {
-		fmt.Println(name)
+	//FANTANO: UCfpcfju9rBs5o_xQLXmLQHQ
+	//SOMEORDINARYGAMERS: UCtMVHI3AJD4Qk4hcbZnI9ZQ
+	name, err := c.FetchLatestShortByChannel("UCfpcfju9rBs5o_xQLXmLQHQ")
+	if err != nil {
+		fmt.Println("err..")
 	}
+
+	fmt.Println(name)
 
 	//ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
-	//tm := app.NewTaskManager()
+	//tm := task.NewTaskManager()
 	//
 	//channels := []string{ChannelID}
 	//platforms := []pkg.PlatformName{pkg.PLATFORM}
