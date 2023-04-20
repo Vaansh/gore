@@ -4,6 +4,12 @@ import (
 	platform2 "github.com/Vaansh/gore/internal/platform"
 )
 
+type PlatformName string
+
+const (
+	PLATFORM PlatformName = "PF"
+)
+
 type Task struct {
 	ID         string
 	Producers  []platform2.Publisher
