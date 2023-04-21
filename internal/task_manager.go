@@ -2,9 +2,8 @@ package internal
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/internal/platform"
-	"github.com/Vaansh/gore/internal/platform/instagram"
-	"github.com/Vaansh/gore/internal/platform/youtube"
+	"github.com/Vaansh/gore/internal/publisher"
+	"github.com/Vaansh/gore/internal/subscriber"
 	"sync"
 )
 
@@ -41,23 +40,23 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
 	}
 
-	prods := make([]platform.Publisher, len(producerIDs))
+	prods := make([]publisher.YoutubePublisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
 		case PLATFORM:
-			prods[i] = youtube.NewPublisher(id)
+			prods[i] = publisher.NewPublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}
 	}
 
-	consumer := instagram.NewSubscriber(consumerID)
+	consumer := subscriber.NewSubscriber(consumerID)
 	task := NewTask(taskID, prods, consumer)
 	tm.Tasks[task.ID] = task
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []platform.Publisher, consumer platform.Subscriber) error {
+func (tm *TaskManager) EditTask(taskID string, producers []publisher.YoutubePublisher, consumer subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("task %s not found", taskID)

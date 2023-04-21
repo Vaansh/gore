@@ -1,23 +1,24 @@
-package youtube
+package publisher
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/internal/http"
 	"time"
 )
 
-type Publisher struct {
+type YoutubePublisher struct {
 	ChannelID string
-	client    *Client
+	client    *http.YoutubeClient
 }
 
-func NewPublisher(channelID string) *Publisher {
-	return &Publisher{
+func NewPublisher(channelID string) *YoutubePublisher {
+	return &YoutubePublisher{
 		ChannelID: channelID,
-		client:    NewClient("ApiKey"),
+		client:    http.NewYoutubeClient("ApiKey"),
 	}
 }
 
-func (p *Publisher) PublishTo(c chan<- string) {
+func (p *YoutubePublisher) PublishTo(c chan<- string) {
 	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
 	fmt.Println(firstURL)
 
@@ -66,7 +67,7 @@ func (p *Publisher) PublishTo(c chan<- string) {
 	}
 }
 
-func (p *Publisher) PublishVideoTo(c chan<- string) {
+func (p *YoutubePublisher) PublishVideoTo(c chan<- string) {
 	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
 	fmt.Println(firstURL)
 
@@ -115,7 +116,7 @@ func (p *Publisher) PublishVideoTo(c chan<- string) {
 	}
 }
 
-func (p *Publisher) GetPublisherID() string {
+func (p *YoutubePublisher) GetPublisherID() string {
 	return p.ChannelID
 }
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/internal/platform/youtube"
+	"github.com/Vaansh/gore/internal/http"
 )
 
 const (
@@ -10,7 +10,7 @@ const (
 )
 
 func main() {
-	c := youtube.NewClient(ApiKey)
+	c := http.NewClient(ApiKey)
 
 	//if name, err := c.FetchChannelName("UCfeMEuhdUtxtaUMNSvxq_Xg"); err == nil {
 	//	fmt.Println(name)
@@ -40,15 +40,15 @@ func main() {
 	//tm.RunAll()
 
 	//videoID := "dCcuIFO_SF8"
-	//client := ytdownloader.Client{}
+	//http := ytdownloader.YoutubeClient{}
 	//
-	//videoLink, err := client.GetVideo(videoID)
+	//videoLink, err := http.GetVideo(videoID)
 	//if err != nil {
 	//	panic(err)
 	//}
 	//
 	//formats := videoLink.Formats.WithAudioChannels()
-	//stream, _, err := client.GetStream(videoLink, &formats[0])
+	//stream, _, err := http.GetStream(videoLink, &formats[0])
 	//if err != nil {
 	//	panic(err)
 	//}

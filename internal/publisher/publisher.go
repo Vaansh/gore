@@ -1,4 +1,4 @@
-package platform
+package publisher
 
 type Publisher interface {
 	PublishTo(c chan<- string)

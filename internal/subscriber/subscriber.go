@@ -1,4 +1,4 @@
-package platform
+package subscriber
 
 type Subscriber interface {
 	SubscribeTo(c <-chan string)

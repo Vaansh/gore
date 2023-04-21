@@ -1,4 +1,4 @@
-package instagram
+package subscriber
 
 import (
 	"fmt"

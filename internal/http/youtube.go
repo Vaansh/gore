@@ -1,4 +1,4 @@
-package youtube
+package http
 
 import (
 	"encoding/json"
@@ -29,18 +29,18 @@ type ChannelShortsListResponse struct {
 	} `json:"items"`
 }
 
-type Client struct {
+type YoutubeClient struct {
 	apiKey string
 }
 
-func NewClient(apiKey string) *Client {
-	return &Client{
+func NewYoutubeClient(apiKey string) *YoutubeClient {
+	return &YoutubeClient{
 		apiKey: "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU",
 	}
 }
 
 // Videos
-func (c *Client) FetchVideo(videoURL string) (map[string]interface{}, error) {
+func (c *YoutubeClient) FetchVideo(videoURL string) (map[string]interface{}, error) {
 	resp, err := http.Get(videoURL)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (c *Client) FetchVideo(videoURL string) (map[string]interface{}, error) {
 	return data, nil
 }
 
-func (c *Client) FetchLatestVideoByChannel(channelID string) (string, error) {
+func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, error) {
 	paginatedVideos := c.PaginatedVideosAPI(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
@@ -82,7 +82,7 @@ func (c *Client) FetchLatestVideoByChannel(channelID string) (string, error) {
 }
 
 // Shorts
-func (c *Client) FetchLatestShortByChannel(channelId string) (string, error) {
+func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
 	fmt.Println(paginatedShorts)
 	resp, err := http.Get(paginatedShorts.String())
@@ -107,7 +107,7 @@ func (c *Client) FetchLatestShortByChannel(channelId string) (string, error) {
 	return response.Items[0].Shorts[0].VideoID, nil
 }
 
-func (c *Client) FetchPaginatedShortsByChannel(channelId string) ([]string, string, error) {
+func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]string, string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
 	fmt.Println(paginatedShorts)
 	resp, err := http.Get(paginatedShorts.String())
@@ -139,7 +139,7 @@ func (c *Client) FetchPaginatedShortsByChannel(channelId string) ([]string, stri
 }
 
 // Channels
-func (c *Client) FetchChannelName(channelId string) (string, error) {
+func (c *YoutubeClient) FetchChannelName(channelId string) (string, error) {
 	paginatedVideos := c.ChannelInfoAPI(channelId)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
@@ -160,7 +160,7 @@ func (c *Client) FetchChannelName(channelId string) (string, error) {
 	return channelName, nil
 }
 
-func (c *Client) PaginatedVideosAPI(channelId string) *url.URL {
+func (c *YoutubeClient) PaginatedVideosAPI(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",
@@ -170,7 +170,7 @@ func (c *Client) PaginatedVideosAPI(channelId string) *url.URL {
 	}
 }
 
-func (c *Client) ChannelInfoAPI(channelId string) *url.URL {
+func (c *YoutubeClient) ChannelInfoAPI(channelId string) *url.URL {
 	return &url.URL{
 		Scheme:     "https",
 		Host:       "www.googleapis.com",
