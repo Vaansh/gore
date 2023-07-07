@@ -26,3 +26,6 @@ _testmain.go
 /goinstall.log
 /last-change
 misc/**
+
+data/**.mp4
+log/**.log

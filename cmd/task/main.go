@@ -1,16 +1,11 @@
 package main
 
-import (
-	"fmt"
-	"github.com/Vaansh/gore/internal/http"
-)
-
 const (
 	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
 )
 
 func main() {
-	c := http.NewClient(ApiKey)
+	//c := http.NewYoutubeClient(ApiKey)
 
 	//if name, err := c.FetchChannelName("UCfeMEuhdUtxtaUMNSvxq_Xg"); err == nil {
 	//	fmt.Println(name)
@@ -18,51 +13,37 @@ func main() {
 
 	//FANTANO: UCfpcfju9rBs5o_xQLXmLQHQ
 	//SOMEORDINARYGAMERS: UCtMVHI3AJD4Qk4hcbZnI9ZQ
-	name, err := c.FetchLatestShortByChannel("UCfpcfju9rBs5o_xQLXmLQHQ")
-	if err != nil {
-		fmt.Println("err..")
-	}
-
-	fmt.Println(name)
+	//name, err := c.FetchLatestShortByChannel("UCfpcfju9rBs5o_xQLXmLQHQ")
+	//if err != nil {
+	//	fmt.Println("err..")
+	//}
+	//
+	//fmt.Println(name)
 
 	//ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
-	//tm := task.NewTaskManager()
+	// Logic1: fetch and exec ig to yt:
+	//ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
+	//tm := internal.NewTaskManager()
 	//
 	//channels := []string{ChannelID}
-	//platforms := []pkg.PlatformName{pkg.PLATFORM}
+	//platforms := []internal.PlatformName{internal.PLATFORM}
 	//
-	//err := tm.AddTask(channels, platforms, "", pkg.PLATFORM)
+	//err := tm.AddTask(channels, platforms, "", internal.PLATFORM)
 	//if err != nil {
 	//	return
 	//}
 	//
 	//tm.RunAll()
+	// -- Logic1 --
 
-	//videoID := "dCcuIFO_SF8"
-	//http := ytdownloader.YoutubeClient{}
-	//
-	//videoLink, err := http.GetVideo(videoID)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//formats := videoLink.Formats.WithAudioChannels()
-	//stream, _, err := http.GetStream(videoLink, &formats[0])
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//file, err := os.Create("video.mp4")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer file.Close()
-	//
-	//_, err = io.Copy(file, stream)
-	//if err != nil {
-	//	panic(err)
-	//}
+	// Logic2: downlaod yt vid
+	//videoId := "dCcuIFO_SF8"
+	// -- Logic2 --
+
+	// Logic3: delete file
+
+	// -- Logic3 --
 	//
 	//insta := goinsta.New("mrbeast.zip", "")
 	//

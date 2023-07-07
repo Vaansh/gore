@@ -44,7 +44,7 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 	for i, id := range producerIDs {
 		switch sources[i] {
 		case PLATFORM:
-			prods[i] = publisher.NewPublisher(id)
+			prods[i] = *publisher.NewPublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}

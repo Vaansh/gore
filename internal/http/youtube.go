@@ -84,7 +84,7 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 // Shorts
 func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
-	fmt.Println(paginatedShorts)
+
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
 		fmt.Println(err)
@@ -109,7 +109,7 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (string, err
 
 func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]string, string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
-	fmt.Println(paginatedShorts)
+
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
 		fmt.Println(err)

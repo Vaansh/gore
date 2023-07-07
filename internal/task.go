@@ -30,5 +30,5 @@ func (t *Task) Run() {
 	for _, p := range t.Producers {
 		go p.PublishTo(c)
 	}
-	go t.Subscriber.SubscribeTo(c)
+	go t.Subscriber.SubscribeTo(c, PLATFORM)
 }

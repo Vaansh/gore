@@ -18,7 +18,7 @@ func NewPublisher(channelID string) *YoutubePublisher {
 	}
 }
 
-func (p *YoutubePublisher) PublishTo(c chan<- string) {
+func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
 	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
 	fmt.Println(firstURL)
 
@@ -67,52 +67,45 @@ func (p *YoutubePublisher) PublishTo(c chan<- string) {
 	}
 }
 
-func (p *YoutubePublisher) PublishVideoTo(c chan<- string) {
-	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
-	fmt.Println(firstURL)
-
-	videoURL := firstURL.String()
+func (p *YoutubePublisher) PublishTo(c chan<- string) {
+	fmt.Println("Fetching Paginated shorts")
 	for {
-		data, err := p.client.FetchVideo(videoURL)
+		videoIds, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
+
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
 
-		for _, item := range data["items"].([]interface{}) {
-			itemMap := item.(map[string]interface{})
-			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
-				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
-				c <- videoID
-			}
+		for _, videoId := range videoIds {
+			c <- videoId
 		}
 
-		if nextPageToken, ok := data["nextPageToken"].(string); ok {
-			videoURL = fmt.Sprintf("%s&pageToken=%s", firstURL, nextPageToken)
-		} else {
+		if nextPageToken == "" {
 			break
 		}
 
-		time.Sleep(3 * time.Hour)
+		time.Sleep(10 * time.Second)
 	}
 
+	fmt.Println("Fetching New shorts")
 	var videosBuffer []string
 	for {
-		mostRecentUpload, err := p.client.FetchLatestVideoByChannel(p.ChannelID)
+		videoId, err := p.client.FetchLatestShortByChannel(p.ChannelID)
 
 		if err != nil {
 		}
 
-		if !contains(videosBuffer, mostRecentUpload) {
-			c <- mostRecentUpload
-			videosBuffer = append(videosBuffer, mostRecentUpload)
+		if !contains(videosBuffer, videoId) {
+			c <- videoId
+			videosBuffer = append(videosBuffer, videoId)
 		}
 
 		if len(videosBuffer) == 50 {
 			videosBuffer = make([]string, 0)
 		}
 
-		time.Sleep(3 * time.Hour)
+		time.Sleep(10 * time.Second)
 	}
 }
 
