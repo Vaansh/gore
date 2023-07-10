@@ -2,6 +2,7 @@ package subscriber
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/util"
@@ -10,10 +11,11 @@ import (
 
 type InstagramSubscriber struct {
 	InstagramID string
+	repository  database.UserRepository
 }
 
-func NewInstagramSubscriber(InstagramID string) *InstagramSubscriber {
-	return &InstagramSubscriber{InstagramID: InstagramID}
+func NewInstagramSubscriber(instagramId string, repository database.UserRepository) *InstagramSubscriber {
+	return &InstagramSubscriber{InstagramID: instagramId, repository: repository}
 }
 
 func (s InstagramSubscriber) SubscribeTo(c <-chan model.Post) {

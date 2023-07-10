@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/Vaansh/gore/internal"
-	"github.com/Vaansh/gore/internal/config"
+	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/platform"
 	"os"
 )
 
 func main() {
-	db, err := config.ConnectToDB()
+	db, err := database.ConnectDb()
 	if err != nil {
 		fmt.Printf("Error connecting to the database: %s\n", err)
 		os.Exit(1)
@@ -38,7 +38,7 @@ func main() {
 	channels := []string{ChannelID}
 	platforms := []platform.Name{platform.YOUTUBE}
 
-	err = tm.AddTask(channels, platforms, "", platform.INSTAGRAM)
+	err = tm.AddTask(channels, platforms, "", platform.INSTAGRAM, *database.NewUserRepository(db))
 	if err != nil {
 		return
 	}

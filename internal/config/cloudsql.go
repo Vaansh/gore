@@ -2,13 +2,18 @@ package config
 
 import (
 	"cloud.google.com/go/compute/metadata"
-	"database/sql"
-	"fmt"
 	"github.com/Vaansh/gore/internal/util"
 	"os"
 )
 
-func ConnectToDB() (*sql.DB, error) {
+type DBConfig struct {
+	Username  string
+	Password  string
+	Database  string
+	ProjectID string
+}
+
+func ReadDbConfig() (*DBConfig, error) {
 	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	if projectID == "" {
 		var err error
@@ -19,21 +24,12 @@ func ConnectToDB() (*sql.DB, error) {
 		}
 	}
 
-	username := util.MustGetenv("POSTGRES_USER")
-	password := util.MustGetenv("POSTGRES_PASSWORD")
-	dbName := util.MustGetenv("POSTGRES_DB")
-
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s host=/cloudsql/%s", username, password, dbName, projectID)
-
-	db, err := sql.Open("postgres", connectionString)
-	if err != nil {
-		return nil, err
-	}
-	db.SetMaxOpenConns(10)
-
-	if err = db.Ping(); err != nil {
-		return nil, err
+	config := &DBConfig{
+		Username:  util.MustGetenv("POSTGRES_USER"),
+		Password:  util.MustGetenv("POSTGRES_PASSWORD"),
+		Database:  util.MustGetenv("POSTGRES_DB"),
+		ProjectID: projectID,
 	}
 
-	return db, nil
+	return config, nil
 }

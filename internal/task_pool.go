@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
@@ -31,10 +32,10 @@ func (tm *TaskPool) RunAll() {
 	wg.Wait()
 }
 
-func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subscriberId string, destination platform.Name) error {
+func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subscriberId string, destination platform.Name, repository database.UserRepository) error {
 	taskID := string(destination) + subscriberId
 	if _, exists := tm.Tasks[taskID]; exists {
-		return fmt.Errorf("worker with ID %s already exists", taskID)
+		return fmt.Errorf("worker with id %s already exists", taskID)
 	}
 
 	if len(publisherIds) != len(sources) {
@@ -52,7 +53,7 @@ func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subs
 	}
 
 	if destination == platform.INSTAGRAM {
-		consumer := subscriber.NewInstagramSubscriber(subscriberId)
+		consumer := subscriber.NewInstagramSubscriber(subscriberId, repository)
 		task := NewTask(taskID, prods, consumer)
 		tm.Tasks[task.ID] = task
 	}
@@ -63,7 +64,7 @@ func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subs
 func (tm *TaskPool) EditTask(taskID string, publishers []publisher.Publisher, subscriber subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
-		return fmt.Errorf("worker %s not found", taskID)
+		return fmt.Errorf("task %s not found", taskID)
 	}
 	task.Publishers = publishers
 	task.Subscriber = subscriber

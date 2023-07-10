@@ -97,9 +97,9 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 		if err != nil {
 		}
 
-		if !contains(videosBuffer, post.ID) {
+		if !contains(videosBuffer, post.PostId) {
 			c <- post
-			videosBuffer = append(videosBuffer, post.ID)
+			videosBuffer = append(videosBuffer, post.PostId)
 		}
 
 		if len(videosBuffer) == 50 {

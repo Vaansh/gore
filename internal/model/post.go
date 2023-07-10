@@ -6,24 +6,25 @@ import (
 )
 
 type Post struct {
-	ID, sourceLink       string
+	PostId, SourceId     string
 	tag, Caption, Author string
 	PlatformName         platform.Name
 }
 
-func NewPost(id, caption, author string, platformName platform.Name) *Post {
+func NewPost(id, caption, author, sourceId string, platformName platform.Name) *Post {
 	return &Post{
-		ID:           id,
+		PostId:       id,
 		Caption:      caption,
 		Author:       author,
+		SourceId:     sourceId,
 		PlatformName: platformName,
 	}
 }
 
 func (p Post) GetParams() (string, string, platform.Name, string) {
-	return p.ID, p.Author, p.PlatformName, p.Caption
+	return p.PostId, p.Author, p.PlatformName, p.Caption
 }
 
 func (p Post) String() string {
-	return fmt.Sprintf("ID: %s Author:%s Platform:%s", p.ID, p.Author, p.PlatformName)
+	return fmt.Sprintf("Id: %s Author:%s Platform:%s", p.PostId, p.Author, p.PlatformName)
 }
