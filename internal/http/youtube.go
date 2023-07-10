@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-type ChannelShortsListResponse struct {
+type ShortsListByChannelResponse struct {
 	Kind  string `json:"kind"`
 	Etag  string `json:"etag"`
 	Items []struct {
@@ -47,6 +47,70 @@ func NewYoutubeClient() *YoutubeClient {
 	return &YoutubeClient{
 		apiKey: os.Getenv("YOUTUBE_API_KEY"),
 	}
+}
+
+// Shorts
+func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post, error) {
+	paginatedShorts := PaginatedShortsAPI(channelId)
+
+	resp, err := http.Get(paginatedShorts.String())
+	if err != nil {
+		fmt.Println(err)
+		return model.Post{}, err
+	}
+
+	defer resp.Body.Close()
+
+	var response ShortsListByChannelResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		fmt.Println(err)
+		return model.Post{}, err
+	}
+
+	if len(response.Items) < 1 || len(response.Items[0].Shorts) < 1 {
+		return model.Post{}, errors.New("invalid response")
+	}
+
+	author, err := c.FetchChannelName(channelId)
+	if err != nil {
+	}
+	return *model.NewPost(response.Items[0].Shorts[0].VideoID, response.Items[0].Shorts[0].Title, author, platform.YOUTUBE), nil
+}
+
+func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model.Post, string, error) {
+	paginatedShorts := PaginatedShortsAPI(channelId)
+
+	resp, err := http.Get(paginatedShorts.String())
+	if err != nil {
+		fmt.Println(err)
+		return nil, "", err
+	}
+
+	defer resp.Body.Close()
+
+	var response ShortsListByChannelResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		fmt.Println(err)
+		return nil, "", err
+	}
+
+	var posts []model.Post
+	var nextPageToken string
+
+	author, err := c.FetchChannelName(channelId)
+	if err != nil {
+	}
+
+	for _, item := range response.Items {
+		for _, short := range item.Shorts {
+			posts = append(posts, *model.NewPost(short.VideoID, short.Title, author, platform.YOUTUBE))
+		}
+		nextPageToken = item.NextPageToken
+	}
+
+	return posts, nextPageToken, nil
 }
 
 // Videos
@@ -89,68 +153,6 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 	videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
 
 	return videoID, nil
-}
-
-// Shorts
-func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post, error) {
-	paginatedShorts := PaginatedShortsAPI(channelId)
-
-	resp, err := http.Get(paginatedShorts.String())
-	if err != nil {
-		fmt.Println(err)
-		return model.Post{}, err
-	}
-
-	defer resp.Body.Close()
-
-	var response ChannelShortsListResponse
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	if err != nil {
-		fmt.Println(err)
-		return model.Post{}, err
-	}
-
-	if len(response.Items) < 1 || len(response.Items[0].Shorts) < 1 {
-		return model.Post{}, errors.New("invalid response")
-	}
-
-	author, err := c.FetchChannelName(channelId)
-	return *model.NewPost(response.Items[0].Shorts[0].VideoID, response.Items[0].Shorts[0].Title,
-		author, platform.YOUTUBE), nil
-}
-
-func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model.Post, string, error) {
-	paginatedShorts := PaginatedShortsAPI(channelId)
-
-	resp, err := http.Get(paginatedShorts.String())
-	if err != nil {
-		fmt.Println(err)
-		return nil, "", err
-	}
-
-	defer resp.Body.Close()
-
-	var response ChannelShortsListResponse
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	if err != nil {
-		fmt.Println(err)
-		return nil, "", err
-	}
-
-	var posts []model.Post
-	var nextPageToken string
-
-	for _, item := range response.Items {
-		for _, short := range item.Shorts {
-			author, err := c.FetchChannelName(channelId)
-			if err != nil {
-			}
-			posts = append(posts, *model.NewPost(short.VideoID, short.Title, author, platform.YOUTUBE))
-		}
-		nextPageToken = item.NextPageToken
-	}
-
-	return posts, nextPageToken, nil
 }
 
 // Channels
