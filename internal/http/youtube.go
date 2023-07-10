@@ -13,25 +13,31 @@ import (
 	"os"
 )
 
+type Thumbnails struct {
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+}
+
+type Short struct {
+	VideoID    string       `json:"videoId"`
+	Title      string       `json:"title"`
+	Thumbnails []Thumbnails `json:"thumbnails"`
+	ViewCount  int          `json:"viewCount"`
+}
+
+type Item struct {
+	Kind          string  `json:"kind"`
+	Etag          string  `json:"etag"`
+	ID            string  `json:"id"`
+	Shorts        []Short `json:"shorts"`
+	NextPageToken string  `json:"nextPageToken"`
+}
+
 type ShortsListByChannelResponse struct {
 	Kind  string `json:"kind"`
 	Etag  string `json:"etag"`
-	Items []struct {
-		Kind   string `json:"kind"`
-		Etag   string `json:"etag"`
-		ID     string `json:"id"`
-		Shorts []struct {
-			VideoID    string `json:"videoId"`
-			Title      string `json:"title"`
-			Thumbnails []struct {
-				URL    string `json:"url"`
-				Width  int    `json:"width"`
-				Height int    `json:"height"`
-			} `json:"thumbnails"`
-			ViewCount int `json:"viewCount"`
-		} `json:"shorts"`
-		NextPageToken string `json:"nextPageToken"`
-	} `json:"items"`
+	Items []Item `json:"items"`
 }
 
 type YoutubeClient struct {

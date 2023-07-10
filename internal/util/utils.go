@@ -4,12 +4,21 @@ import (
 	"fmt"
 	"github.com/kkdai/youtube/v2"
 	"io"
+	"log"
 	"os"
 )
 
 const (
 	DIRECTORY = "data"
 )
+
+func MustGetenv(k string) string {
+	v := os.Getenv(k)
+	if v == "" {
+		log.Fatalf("Fatal Error: %s environment variable not set.\n", k)
+	}
+	return v
+}
 
 func SaveYoutubeVideo(id string) {
 	http := youtube.Client{}

@@ -8,17 +8,17 @@ import (
 	"sync"
 )
 
-type TaskManager struct {
+type Pool struct {
 	Tasks map[string]*Task
 }
 
-func NewTaskManager() *TaskManager {
-	return &TaskManager{
+func NewPool() *Pool {
+	return &Pool{
 		Tasks: make(map[string]*Task),
 	}
 }
 
-func (tm *TaskManager) RunAll() {
+func (tm *Pool) RunAll() {
 	var wg sync.WaitGroup
 	for _, task := range tm.Tasks {
 		wg.Add(1)
@@ -31,10 +31,10 @@ func (tm *TaskManager) RunAll() {
 	wg.Wait()
 }
 
-func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Name, consumerID string, destination platform.Name) error {
+func (tm *Pool) AddTask(producerIDs []string, sources []platform.Name, consumerID string, destination platform.Name) error {
 	taskID := string(destination) + consumerID
 	if _, exists := tm.Tasks[taskID]; exists {
-		return fmt.Errorf("task with ID %s already exists", taskID)
+		return fmt.Errorf("worker with ID %s already exists", taskID)
 	}
 
 	if len(producerIDs) != len(sources) {
@@ -60,16 +60,16 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Name, co
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []publisher.Publisher, consumer subscriber.Subscriber) error {
+func (tm *Pool) EditTask(taskID string, producers []publisher.Publisher, consumer subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
-		return fmt.Errorf("task %s not found", taskID)
+		return fmt.Errorf("worker %s not found", taskID)
 	}
 	task.Producers = producers
 	task.Subscriber = consumer
 	return nil
 }
 
-func (tm *TaskManager) DeleteTask(taskID string) {
+func (tm *Pool) DeleteTask(taskID string) {
 	delete(tm.Tasks, taskID)
 }

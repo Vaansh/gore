@@ -1,11 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Vaansh/gore/internal"
+	"github.com/Vaansh/gore/internal/config"
 	"github.com/Vaansh/gore/internal/platform"
+	"os"
 )
 
 func main() {
+	db, err := config.ConnectToDB()
+	if err != nil {
+		fmt.Printf("Error connecting to the database: %s\n", err)
+		os.Exit(1)
+	}
+	defer db.Close()
 	//c := http.NewYoutubeClient(ApiKey)
 
 	//if name, err := c.FetchChannelName("UCfeMEuhdUtxtaUMNSvxq_Xg"); err == nil {
@@ -24,12 +33,12 @@ func main() {
 	ChannelID := "UCfpcfju9rBs5o_xQLXmLQHQ"
 	// Logic1: fetch and exec ig to yt:
 	//ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
-	tm := internal.NewTaskManager()
+	tm := internal.NewPool()
 
 	channels := []string{ChannelID}
 	platforms := []platform.Name{platform.YOUTUBE}
 
-	err := tm.AddTask(channels, platforms, "", platform.INSTAGRAM)
+	err = tm.AddTask(channels, platforms, "", platform.INSTAGRAM)
 	if err != nil {
 		return
 	}
