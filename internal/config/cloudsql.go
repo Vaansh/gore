@@ -29,6 +29,7 @@ func ConnectToDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.SetMaxOpenConns(10)
 
 	if err = db.Ping(); err != nil {
 		return nil, err

@@ -33,7 +33,7 @@ func main() {
 	ChannelID := "UCfpcfju9rBs5o_xQLXmLQHQ"
 	// Logic1: fetch and exec ig to yt:
 	//ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
-	tm := internal.NewPool()
+	tm := internal.NewTaskPool()
 
 	channels := []string{ChannelID}
 	platforms := []platform.Name{platform.YOUTUBE}
