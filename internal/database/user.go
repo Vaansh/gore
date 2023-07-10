@@ -35,13 +35,21 @@ func (r *UserRepository) createUser(user *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) AddRecord(post *model.Post, user *model.User) error {
-	tableName := getTableName(user)
+func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
 	query := fmt.Sprintf("INSERT INTO %s (platform, source_id, author_name, post_id) VALUES ($1, $2, $3, $4);", tableName)
 	if _, err := r.db.Exec(query, post.PlatformName, post.SourceId, post.Author, post.PostId); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepository) CheckIfRecordExists(tableName string, post *model.Post) (bool, error) {
+	var count int
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE platformName = $1 AND source_id = $2 AND post_id = $3;", tableName)
+	if err := r.db.QueryRow(query, post.PlatformName, post.SourceId, post.PostId).Scan(&count); err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func getTableName(user *model.User) string {

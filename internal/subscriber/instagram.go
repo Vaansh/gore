@@ -10,27 +10,45 @@ import (
 )
 
 type InstagramSubscriber struct {
-	InstagramID string
+	instagramId string
 	repository  database.UserRepository
 }
 
 func NewInstagramSubscriber(instagramId string, repository database.UserRepository) *InstagramSubscriber {
-	return &InstagramSubscriber{InstagramID: instagramId, repository: repository}
+	return &InstagramSubscriber{instagramId: instagramId, repository: repository}
 }
 
 func (s InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 	for post := range c {
 		fmt.Println(post)
-		id, _, sourcePlatform, _ := post.GetParams()
+		postId, _, sourcePlatform, _, _ := post.GetParams()
+
 		if sourcePlatform == platform.YOUTUBE {
-			util.SaveYoutubeVideo(id)
+			util.SaveYoutubeVideo(postId)
 		}
+
+		exists, err := s.repository.CheckIfRecordExists(s.getTableName(), &post)
+		if err != nil {
+		}
+
+		if exists {
+			util.Delete(postId)
+			continue
+		}
+
 		// TODO: Client posting logic
+		err = s.repository.AddRecord(s.getTableName(), &post)
+		if err != nil {
+		}
+
 		time.Sleep(10 * time.Second)
-		util.Delete(id)
 	}
 }
 
 func (s InstagramSubscriber) GetSubscriberID() string {
-	return s.InstagramID
+	return s.instagramId
+}
+
+func (s InstagramSubscriber) getTableName() string {
+	return s.instagramId + platform.INSTAGRAM.String()
 }
