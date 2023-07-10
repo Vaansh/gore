@@ -15,6 +15,6 @@ func NewPost(id, caption, author string) *Post {
 		ID:           id,
 		caption:      caption,
 		author:       author,
-		platformName: internal.PLATFORM,
+		platformName: internal.YOUTUBE,
 	}
 }

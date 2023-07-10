@@ -2,22 +2,22 @@ package internal
 
 import (
 	"github.com/Vaansh/gore/internal/publisher"
-	platform2 "github.com/Vaansh/gore/internal/subscriber"
+	"github.com/Vaansh/gore/internal/subscriber"
 )
 
 type PlatformName string
 
 const (
-	PLATFORM PlatformName = "PF"
+	YOUTUBE PlatformName = "YT"
 )
 
 type Task struct {
 	ID         string
-	Producers  []publisher.YoutubePublisher
-	Subscriber platform2.Subscriber
+	Producers  []publisher.Publisher
+	Subscriber subscriber.Subscriber
 }
 
-func NewTask(Id string, producers []publisher.YoutubePublisher, subscriber platform2.Subscriber) *Task {
+func NewTask(Id string, producers []publisher.Publisher, subscriber subscriber.Subscriber) *Task {
 	return &Task{
 		ID:         Id,
 		Producers:  producers,
@@ -30,5 +30,5 @@ func (t *Task) Run() {
 	for _, p := range t.Producers {
 		go p.PublishTo(c)
 	}
-	go t.Subscriber.SubscribeTo(c, PLATFORM)
+	go t.Subscriber.SubscribeTo(c)
 }

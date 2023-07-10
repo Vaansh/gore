@@ -40,23 +40,23 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
 	}
 
-	prods := make([]publisher.YoutubePublisher, len(producerIDs))
+	prods := make([]publisher.Publisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
-		case PLATFORM:
-			prods[i] = *publisher.NewPublisher(id)
+		case YOUTUBE:
+			prods[i] = *publisher.NewYoutubePublisher(id)
 		default:
 			return fmt.Errorf("platform not found %s for %s", sources[i], id)
 		}
 	}
 
-	consumer := subscriber.NewSubscriber(consumerID)
+	consumer := subscriber.NewInstagramSubscriber(consumerID)
 	task := NewTask(taskID, prods, consumer)
 	tm.Tasks[task.ID] = task
 	return nil
 }
 
-func (tm *TaskManager) EditTask(taskID string, producers []publisher.YoutubePublisher, consumer subscriber.Subscriber) error {
+func (tm *TaskManager) EditTask(taskID string, producers []publisher.Publisher, consumer subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("task %s not found", taskID)

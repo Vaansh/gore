@@ -1,5 +1,7 @@
 package main
 
+import "github.com/Vaansh/gore/internal"
+
 const (
 	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
 )
@@ -23,18 +25,18 @@ func main() {
 	//ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
 
 	// Logic1: fetch and exec ig to yt:
-	//ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
-	//tm := internal.NewTaskManager()
-	//
-	//channels := []string{ChannelID}
-	//platforms := []internal.PlatformName{internal.PLATFORM}
-	//
-	//err := tm.AddTask(channels, platforms, "", internal.PLATFORM)
-	//if err != nil {
-	//	return
-	//}
-	//
-	//tm.RunAll()
+	ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
+	tm := internal.NewTaskManager()
+
+	channels := []string{ChannelID}
+	platforms := []internal.PlatformName{internal.YOUTUBE}
+
+	err := tm.AddTask(channels, platforms, "", internal.YOUTUBE)
+	if err != nil {
+		return
+	}
+
+	tm.RunAll()
 	// -- Logic1 --
 
 	// Logic2: downlaod yt vid
@@ -78,6 +80,21 @@ func main() {
 	//}
 	//
 	//fmt.Println(len(following.Users))
+
+	// Logic4: read env files
+	//err := godotenv.Load(".env")
+	//
+	//if err != nil {
+	//	log.Fatalf("Error loading environment variables file")
+	//}
+	//
+	//name := os.Getenv("ig_user_id")
+	//other := os.Getenv("ACCESS_TOKEN")
+	//
+	//fmt.Println(name)
+	//fmt.Println(other)
+	// -- Logic4 --
+
 }
 
 //Mindc-blowing stunts and insane challenges 🤯

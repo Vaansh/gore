@@ -27,5 +27,7 @@ _testmain.go
 /last-change
 misc/**
 
+.env
+
 data/**.mp4
 log/**.log

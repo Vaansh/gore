@@ -11,7 +11,7 @@ type YoutubePublisher struct {
 	client    *http.YoutubeClient
 }
 
-func NewPublisher(channelID string) *YoutubePublisher {
+func NewYoutubePublisher(channelID string) *YoutubePublisher {
 	return &YoutubePublisher{
 		ChannelID: channelID,
 		client:    http.NewYoutubeClient("ApiKey"),
@@ -67,7 +67,7 @@ func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
 	}
 }
 
-func (p *YoutubePublisher) PublishTo(c chan<- string) {
+func (p YoutubePublisher) PublishTo(c chan<- string) {
 	fmt.Println("Fetching Paginated shorts")
 	for {
 		videoIds, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
@@ -109,7 +109,7 @@ func (p *YoutubePublisher) PublishTo(c chan<- string) {
 	}
 }
 
-func (p *YoutubePublisher) GetPublisherID() string {
+func (p YoutubePublisher) GetPublisherID() string {
 	return p.ChannelID
 }
 
