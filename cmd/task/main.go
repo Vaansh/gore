@@ -33,7 +33,7 @@ func main() {
 	channels := []string{ChannelID}
 	platforms := []platform.Name{platform.YOUTUBE}
 
-	err := tm.AddTask(channels, platforms, "", platform.YOUTUBE)
+	err := tm.AddTask(channels, platforms, "", platform.INSTAGRAM)
 	if err != nil {
 		return
 	}

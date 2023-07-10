@@ -14,7 +14,7 @@ type YoutubePublisher struct {
 func NewYoutubePublisher(channelID string) *YoutubePublisher {
 	return &YoutubePublisher{
 		ChannelID: channelID,
-		client:    http.NewYoutubeClient("ApiKey"),
+		client:    http.NewYoutubeClient(),
 	}
 }
 

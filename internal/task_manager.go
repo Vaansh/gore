@@ -51,9 +51,12 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Name, co
 		}
 	}
 
-	consumer := subscriber.NewInstagramSubscriber(consumerID)
-	task := NewTask(taskID, prods, consumer)
-	tm.Tasks[task.ID] = task
+	if destination == platform.INSTAGRAM {
+		consumer := subscriber.NewInstagramSubscriber(consumerID)
+		task := NewTask(taskID, prods, consumer)
+		tm.Tasks[task.ID] = task
+	}
+
 	return nil
 }
 

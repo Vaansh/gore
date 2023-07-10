@@ -1,13 +1,13 @@
 package model
 
 import (
-	"github.com/Vaansh/gore/internal"
+	"github.com/Vaansh/gore/internal/platform"
 )
 
 type Post struct {
 	ID, sourceLink       string
 	tag, caption, author string
-	platformName         internal.PlatformName
+	platformName         platform.Name
 }
 
 func NewPost(id, caption, author string) *Post {
@@ -15,6 +15,6 @@ func NewPost(id, caption, author string) *Post {
 		ID:           id,
 		caption:      caption,
 		author:       author,
-		platformName: internal.YOUTUBE,
+		platformName: platform.YOUTUBE,
 	}
 }
