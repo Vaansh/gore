@@ -1,14 +1,9 @@
 package internal
 
 import (
+	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
-)
-
-type PlatformName string
-
-const (
-	YOUTUBE PlatformName = "YT"
 )
 
 type Task struct {
@@ -30,5 +25,5 @@ func (t *Task) Run() {
 	for _, p := range t.Producers {
 		go p.PublishTo(c)
 	}
-	go t.Subscriber.SubscribeTo(c)
+	go t.Subscriber.SubscribeTo(c, platform.YOUTUBE)
 }

@@ -1,3 +1,4 @@
+.env
 .idea/**
 **/**.DS_Store
 *.[56789ao]
@@ -26,8 +27,5 @@ _testmain.go
 /goinstall.log
 /last-change
 misc/**
-
-.env
-
 data/**.mp4
 log/**.log

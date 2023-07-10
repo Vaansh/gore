@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
 	"sync"
@@ -30,7 +31,7 @@ func (tm *TaskManager) RunAll() {
 	wg.Wait()
 }
 
-func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, consumerID string, destination PlatformName) error {
+func (tm *TaskManager) AddTask(producerIDs []string, sources []platform.Name, consumerID string, destination platform.Name) error {
 	taskID := string(destination) + consumerID
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("task with ID %s already exists", taskID)
@@ -43,10 +44,10 @@ func (tm *TaskManager) AddTask(producerIDs []string, sources []PlatformName, con
 	prods := make([]publisher.Publisher, len(producerIDs))
 	for i, id := range producerIDs {
 		switch sources[i] {
-		case YOUTUBE:
+		case platform.YOUTUBE:
 			prods[i] = *publisher.NewYoutubePublisher(id)
 		default:
-			return fmt.Errorf("platform not found %s for %s", sources[i], id)
+			return fmt.Errorf("supported.go not found %s for %s", sources[i], id)
 		}
 	}
 

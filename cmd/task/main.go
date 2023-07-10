@@ -1,6 +1,9 @@
 package main
 
-import "github.com/Vaansh/gore/internal"
+import (
+	"github.com/Vaansh/gore/internal"
+	"github.com/Vaansh/gore/internal/platform"
+)
 
 const (
 	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
@@ -22,16 +25,15 @@ func main() {
 	//
 	//fmt.Println(name)
 
-	//ChannelID := "UCfeMEuhdUtxtaUMNSvxq_Xg"
-
+	ChannelID := "UCfpcfju9rBs5o_xQLXmLQHQ"
 	// Logic1: fetch and exec ig to yt:
-	ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
+	//ChannelID := "UCtMVHI3AJD4Qk4hcbZnI9ZQ"
 	tm := internal.NewTaskManager()
 
 	channels := []string{ChannelID}
-	platforms := []internal.PlatformName{internal.YOUTUBE}
+	platforms := []platform.Name{platform.YOUTUBE}
 
-	err := tm.AddTask(channels, platforms, "", internal.YOUTUBE)
+	err := tm.AddTask(channels, platforms, "", platform.YOUTUBE)
 	if err != nil {
 		return
 	}
