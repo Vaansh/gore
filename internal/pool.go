@@ -31,18 +31,18 @@ func (tm *Pool) RunAll() {
 	wg.Wait()
 }
 
-func (tm *Pool) AddTask(producerIDs []string, sources []platform.Name, consumerID string, destination platform.Name) error {
-	taskID := string(destination) + consumerID
+func (tm *Pool) AddTask(publisherIds []string, sources []platform.Name, subscriberId string, destination platform.Name) error {
+	taskID := string(destination) + subscriberId
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("worker with ID %s already exists", taskID)
 	}
 
-	if len(producerIDs) != len(sources) {
-		return fmt.Errorf("received %d producerIds and %d platforms", len(producerIDs), len(sources))
+	if len(publisherIds) != len(sources) {
+		return fmt.Errorf("received %d publisherIds and %d platforms", len(publisherIds), len(sources))
 	}
 
-	prods := make([]publisher.Publisher, len(producerIDs))
-	for i, id := range producerIDs {
+	prods := make([]publisher.Publisher, len(publisherIds))
+	for i, id := range publisherIds {
 		switch sources[i] {
 		case platform.YOUTUBE:
 			prods[i] = *publisher.NewYoutubePublisher(id)
@@ -52,7 +52,7 @@ func (tm *Pool) AddTask(producerIDs []string, sources []platform.Name, consumerI
 	}
 
 	if destination == platform.INSTAGRAM {
-		consumer := subscriber.NewInstagramSubscriber(consumerID)
+		consumer := subscriber.NewInstagramSubscriber(subscriberId)
 		task := NewTask(taskID, prods, consumer)
 		tm.Tasks[task.ID] = task
 	}
@@ -60,13 +60,13 @@ func (tm *Pool) AddTask(producerIDs []string, sources []platform.Name, consumerI
 	return nil
 }
 
-func (tm *Pool) EditTask(taskID string, producers []publisher.Publisher, consumer subscriber.Subscriber) error {
+func (tm *Pool) EditTask(taskID string, publishers []publisher.Publisher, subscriber subscriber.Subscriber) error {
 	task, ok := tm.Tasks[taskID]
 	if !ok {
 		return fmt.Errorf("worker %s not found", taskID)
 	}
-	task.Producers = producers
-	task.Subscriber = consumer
+	task.Publishers = publishers
+	task.Subscriber = subscriber
 	return nil
 }
 
