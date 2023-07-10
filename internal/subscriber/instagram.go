@@ -2,6 +2,7 @@ package subscriber
 
 import (
 	"fmt"
+	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/util"
 	"time"
@@ -15,15 +16,16 @@ func NewInstagramSubscriber(InstagramID string) *InstagramSubscriber {
 	return &InstagramSubscriber{InstagramID: InstagramID}
 }
 
-func (s InstagramSubscriber) SubscribeTo(c <-chan string, name platform.Name) {
-	if name == platform.YOUTUBE {
-		for videoId := range c {
-			fmt.Println(videoId)
-			util.SaveYoutubeVideo(videoId)
-			// TODO: Client posting logic
-			time.Sleep(10 * time.Second)
-			util.Delete(videoId)
+func (s InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
+	for post := range c {
+		fmt.Println(post)
+		id, _, sourcePlatform, _ := post.GetParams()
+		if sourcePlatform == platform.YOUTUBE {
+			util.SaveYoutubeVideo(id)
 		}
+		// TODO: Client posting logic
+		time.Sleep(10 * time.Second)
+		util.Delete(id)
 	}
 }
 

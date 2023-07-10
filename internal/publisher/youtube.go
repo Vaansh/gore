@@ -3,6 +3,7 @@ package publisher
 import (
 	"fmt"
 	"github.com/Vaansh/gore/internal/http"
+	"github.com/Vaansh/gore/internal/model"
 	"time"
 )
 
@@ -67,18 +68,18 @@ func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
 	}
 }
 
-func (p YoutubePublisher) PublishTo(c chan<- string) {
+func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	fmt.Println("Fetching Paginated shorts")
 	for {
-		videoIds, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
+		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
 
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
 
-		for _, videoId := range videoIds {
-			c <- videoId
+		for _, post := range posts {
+			c <- post
 		}
 
 		if nextPageToken == "" {
@@ -91,14 +92,14 @@ func (p YoutubePublisher) PublishTo(c chan<- string) {
 	fmt.Println("Fetching New shorts")
 	var videosBuffer []string
 	for {
-		videoId, err := p.client.FetchLatestShortByChannel(p.ChannelID)
+		post, err := p.client.FetchLatestShortByChannel(p.ChannelID)
 
 		if err != nil {
 		}
 
-		if !contains(videosBuffer, videoId) {
-			c <- videoId
-			videosBuffer = append(videosBuffer, videoId)
+		if !contains(videosBuffer, post.ID) {
+			c <- post
+			videosBuffer = append(videosBuffer, post.ID)
 		}
 
 		if len(videosBuffer) == 50 {

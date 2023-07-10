@@ -1,8 +1,10 @@
 package subscriber
 
-import "github.com/Vaansh/gore/internal/platform"
+import (
+	"github.com/Vaansh/gore/internal/model"
+)
 
 type Subscriber interface {
-	SubscribeTo(c <-chan string, platform platform.Name)
+	SubscribeTo(c <-chan model.Post)
 	GetSubscriberID() string
 }

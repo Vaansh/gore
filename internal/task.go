@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/Vaansh/gore/internal/platform"
+	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
 )
@@ -21,9 +21,9 @@ func NewTask(Id string, producers []publisher.Publisher, subscriber subscriber.S
 }
 
 func (t *Task) Run() {
-	c := make(chan string)
+	c := make(chan model.Post)
 	for _, p := range t.Producers {
 		go p.PublishTo(c)
 	}
-	go t.Subscriber.SubscribeTo(c, platform.YOUTUBE)
+	go t.Subscriber.SubscribeTo(c)
 }

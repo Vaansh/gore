@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Vaansh/gore/internal/model"
+	"github.com/Vaansh/gore/internal/platform"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -90,13 +92,13 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 }
 
 // Shorts
-func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (string, error) {
+func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
 
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return model.Post{}, err
 	}
 
 	defer resp.Body.Close()
@@ -105,17 +107,19 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (string, err
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return model.Post{}, err
 	}
 
 	if len(response.Items) < 1 || len(response.Items[0].Shorts) < 1 {
-		return "", errors.New("invalid response")
+		return model.Post{}, errors.New("invalid response")
 	}
 
-	return response.Items[0].Shorts[0].VideoID, nil
+	author, err := c.FetchChannelName(channelId)
+	return *model.NewPost(response.Items[0].Shorts[0].VideoID, response.Items[0].Shorts[0].Title,
+		author, platform.YOUTUBE), nil
 }
 
-func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]string, string, error) {
+func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model.Post, string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
 
 	resp, err := http.Get(paginatedShorts.String())
@@ -133,17 +137,20 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]strin
 		return nil, "", err
 	}
 
-	var videoIds []string
+	var posts []model.Post
 	var nextPageToken string
 
 	for _, item := range response.Items {
 		for _, short := range item.Shorts {
-			videoIds = append(videoIds, short.VideoID)
+			author, err := c.FetchChannelName(channelId)
+			if err != nil {
+			}
+			posts = append(posts, *model.NewPost(short.VideoID, short.Title, author, platform.YOUTUBE))
 		}
 		nextPageToken = item.NextPageToken
 	}
 
-	return videoIds, nextPageToken, nil
+	return posts, nextPageToken, nil
 }
 
 // Channels
