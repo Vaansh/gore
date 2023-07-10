@@ -5,10 +5,6 @@ import (
 	"github.com/Vaansh/gore/internal/platform"
 )
 
-const (
-	ApiKey = "AIzaSyDXCuguEKvISldv2uVWXG0itvKRFzlbueU"
-)
-
 func main() {
 	//c := http.NewYoutubeClient(ApiKey)
 
