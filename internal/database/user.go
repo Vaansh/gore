@@ -4,15 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/Vaansh/gore/internal/model"
+	"github.com/Vaansh/gore/internal/platform"
+	"log"
 )
 
 type UserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
+func NewUserRepository(db *sql.DB, id string, platform platform.Name) *UserRepository {
 	r := &UserRepository{db: db}
-	if err := r.createUser(model.NewUser("", "")); err != nil {
+	if err := r.createUser(model.NewUser(id, platform)); err != nil {
 		return nil
 	}
 	return r
@@ -26,10 +28,11 @@ func (r *UserRepository) createUser(user *model.User) error {
 			source_id VARCHAR(50) NOT NULL,
 			author_name VARCHAR(100),
             platform VARCHAR(5) NOT NULL,
+			timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (source_id, post_id)
         );`, tableName)
-
 	if _, err := r.db.Exec(query); err != nil {
+		log.Fatalf(err.Error())
 		return err
 	}
 	return nil
@@ -45,7 +48,7 @@ func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
 
 func (r *UserRepository) CheckIfRecordExists(tableName string, post *model.Post) (bool, error) {
 	var count int
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE platformName = $1 AND source_id = $2 AND post_id = $3;", tableName)
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE platform = $1 AND source_id = $2 AND post_id = $3;", tableName)
 	if err := r.db.QueryRow(query, post.PlatformName, post.SourceId, post.PostId).Scan(&count); err != nil {
 		return false, err
 	}
@@ -53,5 +56,5 @@ func (r *UserRepository) CheckIfRecordExists(tableName string, post *model.Post)
 }
 
 func getTableName(user *model.User) string {
-	return user.Id + user.PlatformName.String()
+	return user.PlatformName.String() + "_" + user.Id
 }

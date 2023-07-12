@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
+	"github.com/Vaansh/gore/internal/util"
 	"time"
 )
 
@@ -21,7 +22,6 @@ func NewYoutubePublisher(channelID string) *YoutubePublisher {
 
 func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
 	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
-	fmt.Println(firstURL)
 
 	videoURL := firstURL.String()
 	for {
@@ -55,7 +55,7 @@ func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
 		if err != nil {
 		}
 
-		if !contains(videosBuffer, mostRecentUpload) {
+		if !util.Contains(videosBuffer, mostRecentUpload) {
 			c <- mostRecentUpload
 			videosBuffer = append(videosBuffer, mostRecentUpload)
 		}
@@ -72,9 +72,7 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	fmt.Println("Fetching Paginated shorts")
 	for {
 		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
-
 		if err != nil {
-			fmt.Println(err)
 			break
 		}
 
@@ -97,7 +95,7 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 		if err != nil {
 		}
 
-		if !contains(videosBuffer, post.PostId) {
+		if !util.Contains(videosBuffer, post.PostId) {
 			c <- post
 			videosBuffer = append(videosBuffer, post.PostId)
 		}
@@ -112,13 +110,4 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 
 func (p YoutubePublisher) GetPublisherID() string {
 	return p.ChannelID
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }

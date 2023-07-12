@@ -20,7 +20,6 @@ func NewInstagramSubscriber(instagramId string, repository database.UserReposito
 
 func (s InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 	for post := range c {
-		fmt.Println(post)
 		postId, _, sourcePlatform, _, _ := post.GetParams()
 
 		if sourcePlatform == platform.YOUTUBE {
@@ -31,16 +30,15 @@ func (s InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 		if err != nil {
 		}
 
-		if exists {
-			util.Delete(postId)
-			continue
+		if !exists {
+			// TODO: Client posting logic
+			fmt.Println("Persisting record to db")
+			err = s.repository.AddRecord(s.getTableName(), &post)
+			if err != nil {
+			}
 		}
 
-		// TODO: Client posting logic
-		err = s.repository.AddRecord(s.getTableName(), &post)
-		if err != nil {
-		}
-
+		util.Delete(postId)
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -50,5 +48,5 @@ func (s InstagramSubscriber) GetSubscriberID() string {
 }
 
 func (s InstagramSubscriber) getTableName() string {
-	return s.instagramId + platform.INSTAGRAM.String()
+	return platform.INSTAGRAM.String() + "_" + s.instagramId
 }

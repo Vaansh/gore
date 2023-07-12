@@ -3,15 +3,15 @@ package platform
 type Name string
 
 const (
-	YOUTUBE   Name = "YT"
-	INSTAGRAM Name = "IG"
+	YOUTUBE   Name = "yt"
+	INSTAGRAM Name = "ig"
 )
 
 func (n Name) String() string {
 	if n == YOUTUBE {
-		return "YT"
+		return "yt"
 	} else if n == INSTAGRAM {
-		return "IG"
+		return "ig"
 	} else {
 		return ""
 	}

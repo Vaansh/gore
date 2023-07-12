@@ -86,7 +86,6 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post,
 
 func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model.Post, string, error) {
 	paginatedShorts := PaginatedShortsAPI(channelId)
-
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
 		fmt.Println(err)
@@ -209,6 +208,6 @@ func PaginatedShortsAPI(videoId string) *url.URL {
 		Host:       "yt.lemnoslife.com",
 		Path:       "channels",
 		ForceQuery: true,
-		RawQuery:   fmt.Sprintf("part=shorts&id=%s&order=date", videoId),
+		RawQuery:   fmt.Sprintf("part=shorts&id=%s", videoId),
 	}
 }
