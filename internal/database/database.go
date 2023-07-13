@@ -22,28 +22,27 @@ func ConnectDb() (*sql.DB, error) {
 	)
 
 	dsn := fmt.Sprintf("user=%s password=%s database=%s", dbUser, dbPwd, dbName)
-	dbcfg, err := pgx.ParseConfig(dsn)
+	dbCfg, err := pgx.ParseConfig(dsn)
 	if err != nil {
 		return nil, err
 	}
 
 	var opts []cloudsqlconn.Option
-	d, err := cloudsqlconn.NewDialer(context.Background(), opts...)
+	dialer, err := cloudsqlconn.NewDialer(context.Background(), opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	dbcfg.DialFunc = func(ctx context.Context, network, instance string) (net.Conn, error) {
-		return d.Dial(ctx, instanceConnectionName)
+	dbCfg.DialFunc = func(ctx context.Context, network, instance string) (net.Conn, error) {
+		return dialer.Dial(ctx, instanceConnectionName)
 	}
 
-	dbURI := stdlib.RegisterConnConfig(dbcfg)
+	dbURI := stdlib.RegisterConnConfig(dbCfg)
 	dbPool, err := sql.Open("pgx", dbURI)
-	dbPool.SetMaxOpenConns(10)
-
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open: %w", err)
 	}
 
+	dbPool.SetMaxOpenConns(10)
 	return dbPool, nil
 }

@@ -9,69 +9,22 @@ import (
 )
 
 type YoutubePublisher struct {
-	ChannelID string
+	channelId string
 	client    *http.YoutubeClient
 }
 
-func NewYoutubePublisher(channelID string) *YoutubePublisher {
+func NewYoutubePublisher(channelId string) *YoutubePublisher {
+	apiKey := util.Getenv("YOUTUBE_API_KEY", true)
 	return &YoutubePublisher{
-		ChannelID: channelID,
-		client:    http.NewYoutubeClient(),
-	}
-}
-
-func (p *YoutubePublisher) PublishVideosTo(c chan<- string) {
-	firstURL := p.client.PaginatedVideosAPI(p.ChannelID)
-
-	videoURL := firstURL.String()
-	for {
-		data, err := p.client.FetchVideo(videoURL)
-		if err != nil {
-			fmt.Println(err)
-			break
-		}
-
-		for _, item := range data["items"].([]interface{}) {
-			itemMap := item.(map[string]interface{})
-			if itemMap["id"].(map[string]interface{})["kind"] == "youtube#video" {
-				videoID := itemMap["id"].(map[string]interface{})["videoId"].(string)
-				c <- videoID
-			}
-		}
-
-		if nextPageToken, ok := data["nextPageToken"].(string); ok {
-			videoURL = fmt.Sprintf("%s&pageToken=%s", firstURL, nextPageToken)
-		} else {
-			break
-		}
-
-		time.Sleep(3 * time.Hour)
-	}
-
-	var videosBuffer []string
-	for {
-		mostRecentUpload, err := p.client.FetchLatestVideoByChannel(p.ChannelID)
-
-		if err != nil {
-		}
-
-		if !util.Contains(videosBuffer, mostRecentUpload) {
-			c <- mostRecentUpload
-			videosBuffer = append(videosBuffer, mostRecentUpload)
-		}
-
-		if len(videosBuffer) == 50 {
-			videosBuffer = make([]string, 0)
-		}
-
-		time.Sleep(3 * time.Hour)
+		channelId: channelId,
+		client:    http.NewYoutubeClient(apiKey),
 	}
 }
 
 func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	fmt.Println("Fetching Paginated shorts")
 	for {
-		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.ChannelID)
+		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
 		if err != nil {
 			break
 		}
@@ -90,7 +43,7 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	fmt.Println("Fetching New shorts")
 	var videosBuffer []string
 	for {
-		post, err := p.client.FetchLatestShortByChannel(p.ChannelID)
+		post, err := p.client.FetchLatestShortByChannel(p.channelId)
 
 		if err != nil {
 		}
@@ -108,6 +61,6 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	}
 }
 
-func (p YoutubePublisher) GetPublisherID() string {
-	return p.ChannelID
+func (p YoutubePublisher) GetPublisherId() string {
+	return p.channelId
 }

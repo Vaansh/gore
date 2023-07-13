@@ -6,5 +6,5 @@ import (
 
 type Publisher interface {
 	PublishTo(c chan<- model.Post)
-	GetPublisherID() string
+	GetPublisherId() string
 }

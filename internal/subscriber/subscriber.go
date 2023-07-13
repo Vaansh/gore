@@ -6,5 +6,5 @@ import (
 
 type Subscriber interface {
 	SubscribeTo(c <-chan model.Post)
-	GetSubscriberID() string
+	GetSubscriberId() string
 }

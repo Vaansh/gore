@@ -6,11 +6,8 @@ import (
 	"fmt"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
-	"github.com/joho/godotenv"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 type Thumbnails struct {
@@ -44,15 +41,8 @@ type YoutubeClient struct {
 	apiKey string
 }
 
-func NewYoutubeClient() *YoutubeClient {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading environment variables file")
-	}
-
-	return &YoutubeClient{
-		apiKey: os.Getenv("YOUTUBE_API_KEY"),
-	}
+func NewYoutubeClient(apiKey string) *YoutubeClient {
+	return &YoutubeClient{apiKey: apiKey}
 }
 
 // Shorts
