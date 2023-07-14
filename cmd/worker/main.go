@@ -2,32 +2,28 @@ package main
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/internal/database"
-	"github.com/Vaansh/gore/internal/domain"
 	"github.com/Vaansh/gore/internal/handler"
-	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/service"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"time"
 )
 
 func main() {
-	ChannelID := "UCQ4zIVlfhsmvds7WuKeL2Bw"
-	channels := []string{ChannelID}
-	platforms := []platform.Name{platform.YOUTUBE}
+	//channels := []string{ChannelID}
+	//platforms := []platform.Name{platform.YOUTUBE}
 
-	subscriberId := "pewdiepie_exe"
-	subPlatform := platform.INSTAGRAM
-	hashtags := "#pewdiepie #memes #dankmemes #meme #funny #memesdaily #dank #funnymemes #pewdiepiememes #memereview #pewds #spicymemes #dankmeme #lwiay #reels #reelsinstagram #instagram #explore #viral #trending #tiktok #shorts #youtube #fyp #gamer #dailymemes #gaming #mrbeast"
-	task := domain.NewTask(channels, platforms, subscriberId, subPlatform, model.MetaData{IgPostTags: hashtags}, *database.NewUserRepository(db, subscriberId, subPlatform))
+	//ChannelID := "UCQ4zIVlfhsmvds7WuKeL2Bw"
+	//subscriberId := "pewdiepie_exe"
+	//hashtags := "#pewdiepie #memes #dankmemes #meme #funny #memesdaily #dank #funnymemes #pewdiepiememes #memereview #pewds #spicymemes #dankmeme #lwiay #reels #reelsinstagram #instagram #explore #viral #trending #tiktok #shorts #youtube #fyp #gamer #dailymemes #gaming #mrbeast"
 
-	stop := make(chan struct{})
-	go task.Run(stop)
-	time.Sleep(3 * time.Second)
-	stop <- struct{}{}
+	//subPlatform := platform.INSTAGRAM
+	//task := domain.NewTask(channels, platforms, subscriberId, subPlatform, model.MetaData{IgPostTags: hashtags}, *database.NewUserRepository(db, subscriberId, subPlatform))
+
+	//stop := make(chan struct{})
+	//go task.Run(stop)
+	//time.Sleep(3 * time.Second)
+	//stop <- struct{}{}
 
 	taskService, err := service.NewTaskService()
 	if err != nil {

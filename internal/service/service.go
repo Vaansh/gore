@@ -11,10 +11,10 @@ import (
 )
 
 type TaskService struct {
-	Tasks  map[string]*domain.Task
-	QuitCh map[string]chan struct{} // Map to store quit channels for each task
-	mutex  sync.Mutex
-	db     *sql.DB
+	Tasks       map[string]*domain.Task
+	StopChanMap map[string]chan struct{} // Map to store quit channels for each task
+	mutex       sync.Mutex
+	db          *sql.DB
 }
 
 func NewTaskService() (*TaskService, error) {
@@ -24,9 +24,9 @@ func NewTaskService() (*TaskService, error) {
 	}
 
 	return &TaskService{
-		Tasks:  make(map[string]*domain.Task),
-		QuitCh: make(map[string]chan struct{}),
-		db:     db,
+		Tasks:       make(map[string]*domain.Task),
+		StopChanMap: make(map[string]chan struct{}),
+		db:          db,
 	}, nil
 }
 
@@ -46,14 +46,14 @@ func (s *TaskService) RunTask(channels, subscriberID, igPostTags string) error {
 	task := domain.NewTask(chans, plats, subscriberID, platform.INSTAGRAM, model.MetaData{IgPostTags: igPostTags},
 		*database.NewUserRepository(s.db, subscriberID, platform.INSTAGRAM))
 	s.Tasks[taskID] = task
-	s.QuitCh[taskID] = stop
+	s.StopChanMap[taskID] = stop
 
 	go func() {
 		task.Run(stop)
 		s.mutex.Lock()
 		defer s.mutex.Unlock()
 		delete(s.Tasks, taskID)
-		delete(s.QuitCh, taskID)
+		delete(s.StopChanMap, taskID)
 	}()
 
 	return nil
@@ -65,12 +65,12 @@ func (s *TaskService) StopTask(subscriberID, subscriberPlatform string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	if stop, ok := s.QuitCh[taskID]; ok {
+	if stop, ok := s.StopChanMap[taskID]; ok {
 		close(stop)
 		delete(s.Tasks, taskID)
-		delete(s.QuitCh, taskID)
+		delete(s.StopChanMap, taskID)
 		return nil
 	}
 
-	return fmt.Errorf("task not found for the given subscriber, maybe it finished running?")
+	return fmt.Errorf("task not found for the given subscriber, maybe it finished running")
 }
