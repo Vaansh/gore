@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Vaansh/gore/internal"
 	"github.com/Vaansh/gore/internal/database"
+	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
 	"os"
 )
@@ -16,11 +17,7 @@ func main() {
 	}
 	defer db.Close()
 
-	//UCfeMEuhdUtxtaUMNSvxq_Xg
-	//FANTANO: UCfpcfju9rBs5o_xQLXmLQHQ
-	//SOMEORDINARYGAMERS: UCtMVHI3AJD4Qk4hcbZnI9ZQ
-
-	ChannelID := "UCfpcfju9rBs5o_xQLXmLQHQ"
+	ChannelID := "UCQ4zIVlfhsmvds7WuKeL2Bw"
 	tm := internal.NewTaskPool()
 
 	channels := []string{ChannelID}
@@ -28,7 +25,8 @@ func main() {
 
 	subscriberId := "pewdiepie_exe"
 	subPlatform := platform.INSTAGRAM
-	err = tm.AddTask(channels, platforms, subscriberId, subPlatform, *database.NewUserRepository(db, subscriberId, subPlatform))
+	hashtags := "#pewdiepie #memes #dankmemes #meme #funny #memesdaily #dank #funnymemes #pewdiepiememes #memereview #pewds #spicymemes #dankmeme #lwiay #reels #reelsinstagram #instagram #explore #viral #trending #tiktok #shorts #youtube #fyp #gamer #dailymemes #gaming #mrbeast"
+	err = tm.AddTask(channels, platforms, subscriberId, subPlatform, model.MetaData{IgPostTags: hashtags}, *database.NewUserRepository(db, subscriberId, subPlatform))
 	if err != nil {
 		return
 	}

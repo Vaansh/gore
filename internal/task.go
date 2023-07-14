@@ -4,6 +4,7 @@ import (
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
+	"sync"
 )
 
 type Task struct {
@@ -22,8 +23,22 @@ func NewTask(id string, publishers []publisher.Publisher, subscriber subscriber.
 
 func (t *Task) Run() {
 	c := make(chan model.Post)
+	quit := make(chan struct{})
+	
+	var wg sync.WaitGroup
+	wg.Add(len(t.Publishers))
+
 	for _, p := range t.Publishers {
-		go p.PublishTo(c)
+		go func(publisher publisher.Publisher) {
+			defer wg.Done()
+			publisher.PublishTo(c, quit)
+		}(p)
 	}
-	go t.Subscriber.SubscribeTo(c)
+
+	go func() {
+		t.Subscriber.SubscribeTo(c)
+		close(quit)
+	}()
+
+	wg.Wait()
 }

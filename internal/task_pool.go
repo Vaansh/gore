@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"github.com/Vaansh/gore/internal/database"
+	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/publisher"
 	"github.com/Vaansh/gore/internal/subscriber"
@@ -26,13 +27,12 @@ func (tm *TaskPool) RunAll() {
 		go func(t *Task) {
 			defer wg.Done()
 			t.Run()
-			select {}
 		}(task)
 	}
 	wg.Wait()
 }
 
-func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subscriberId string, destination platform.Name, repository database.UserRepository) error {
+func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subscriberId string, destination platform.Name, metadata model.MetaData, repository database.UserRepository) error {
 	taskID := string(destination) + subscriberId
 	if _, exists := tm.Tasks[taskID]; exists {
 		return fmt.Errorf("worker with id %s already exists", taskID)
@@ -46,14 +46,14 @@ func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subs
 	for i, id := range publisherIds {
 		switch sources[i] {
 		case platform.YOUTUBE:
-			prods[i] = *publisher.NewYoutubePublisher(id)
+			prods[i] = publisher.NewYoutubePublisher(id)
 		default:
 			return fmt.Errorf("supported.go not found %s for %s", sources[i], id)
 		}
 	}
 
 	if destination == platform.INSTAGRAM {
-		consumer := subscriber.NewInstagramSubscriber(subscriberId, repository)
+		consumer := subscriber.NewInstagramSubscriber(subscriberId, metadata, repository)
 		task := NewTask(taskID, prods, consumer)
 		tm.Tasks[task.Id] = task
 	}

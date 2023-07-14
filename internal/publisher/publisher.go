@@ -5,6 +5,6 @@ import (
 )
 
 type Publisher interface {
-	PublishTo(c chan<- model.Post)
+	PublishTo(c chan<- model.Post, quit <-chan struct{})
 	GetPublisherId() string
 }

@@ -10,33 +10,6 @@ import (
 	"net/url"
 )
 
-type Thumbnails struct {
-	URL    string `json:"url"`
-	Width  int    `json:"width"`
-	Height int    `json:"height"`
-}
-
-type Short struct {
-	VideoID    string       `json:"videoId"`
-	Title      string       `json:"title"`
-	Thumbnails []Thumbnails `json:"thumbnails"`
-	ViewCount  int          `json:"viewCount"`
-}
-
-type Item struct {
-	Kind          string  `json:"kind"`
-	Etag          string  `json:"etag"`
-	ID            string  `json:"id"`
-	Shorts        []Short `json:"shorts"`
-	NextPageToken string  `json:"nextPageToken"`
-}
-
-type ShortsListByChannelResponse struct {
-	Kind  string `json:"kind"`
-	Etag  string `json:"etag"`
-	Items []Item `json:"items"`
-}
-
 type YoutubeClient struct {
 	apiKey string
 }
@@ -57,7 +30,7 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post,
 
 	defer resp.Body.Close()
 
-	var response ShortsListByChannelResponse
+	var response shortsListByChannelResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		fmt.Println(err)
@@ -84,7 +57,7 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model
 
 	defer resp.Body.Close()
 
-	var response ShortsListByChannelResponse
+	var response shortsListByChannelResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		fmt.Println(err)
@@ -200,4 +173,31 @@ func PaginatedShortsAPI(videoId string) *url.URL {
 		ForceQuery: true,
 		RawQuery:   fmt.Sprintf("part=shorts&id=%s", videoId),
 	}
+}
+
+type thumbnails struct {
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+}
+
+type short struct {
+	VideoID    string       `json:"videoId"`
+	Title      string       `json:"title"`
+	Thumbnails []thumbnails `json:"thumbnails"`
+	ViewCount  int          `json:"viewCount"`
+}
+
+type item struct {
+	Kind          string  `json:"kind"`
+	Etag          string  `json:"etag"`
+	ID            string  `json:"id"`
+	Shorts        []short `json:"shorts"`
+	NextPageToken string  `json:"nextPageToken"`
+}
+
+type shortsListByChannelResponse struct {
+	Kind  string `json:"kind"`
+	Etag  string `json:"etag"`
+	Items []item `json:"items"`
 }

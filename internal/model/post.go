@@ -21,8 +21,8 @@ func NewPost(id, caption, author, sourceId string, platformName platform.Name) *
 	}
 }
 
-func (p Post) GetParams() (string, string, platform.Name, string, string) {
-	return p.PostId, p.Author, p.PlatformName, p.SourceId, p.Caption
+func (p Post) GetParams() (string, string, platform.Name, string) {
+	return p.PostId, p.Author, p.PlatformName, p.Caption
 }
 
 func (p Post) String() string {

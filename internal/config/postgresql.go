@@ -11,7 +11,7 @@ type DBConfig struct {
 	InstanceId string
 }
 
-func ReadDbConfig() (*DBConfig, error) {
+func ReadDbConfig() *DBConfig {
 	config := &DBConfig{
 		Username:   util.Getenv("DB_USER", true),
 		Password:   util.Getenv("DB_PASS", true),
@@ -19,5 +19,5 @@ func ReadDbConfig() (*DBConfig, error) {
 		InstanceId: util.Getenv("INSTANCE_CONNECTION_NAME", true),
 	}
 
-	return config, nil
+	return config
 }

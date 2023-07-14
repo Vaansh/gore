@@ -12,7 +12,7 @@ import (
 )
 
 func ConnectDb() (*sql.DB, error) {
-	cfg, err := config.ReadDbConfig()
+	cfg := config.ReadDbConfig()
 
 	var (
 		dbUser                 = cfg.Username

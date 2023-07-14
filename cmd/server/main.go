@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// Legacy: move to cloud storage
+// LEGACY: moved to cloud storage, don't need this anymore :)
 func main() {
 	port := "8080"
 	workingDir, err := os.Getwd()

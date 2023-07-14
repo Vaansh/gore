@@ -21,16 +21,20 @@ func NewYoutubePublisher(channelId string) *YoutubePublisher {
 	}
 }
 
-func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
+func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) {
 	fmt.Println("Fetching Paginated shorts")
 	for {
 		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
 		if err != nil {
-			break
+			fmt.Println("FetchPaginatedShortsByChannel err")
 		}
 
 		for _, post := range posts {
-			c <- post
+			select {
+			case c <- post:
+			case <-quit:
+				return
+			}
 		}
 
 		if nextPageToken == "" {
@@ -49,8 +53,12 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 		}
 
 		if !util.Contains(videosBuffer, post.PostId) {
-			c <- post
-			videosBuffer = append(videosBuffer, post.PostId)
+			select {
+			case c <- post:
+				videosBuffer = append(videosBuffer, post.PostId)
+			case <-quit:
+				return
+			}
 		}
 
 		if len(videosBuffer) == 50 {
@@ -61,6 +69,6 @@ func (p YoutubePublisher) PublishTo(c chan<- model.Post) {
 	}
 }
 
-func (p YoutubePublisher) GetPublisherId() string {
+func (p *YoutubePublisher) GetPublisherId() string {
 	return p.channelId
 }
