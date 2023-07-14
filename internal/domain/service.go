@@ -18,7 +18,7 @@ type TaskService struct {
 }
 
 func NewTaskService() (*TaskService, error) {
-	db, err := database.ConnectDb()
+	db, err := database.InitDb()
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to the database: %w", err)
 	}
@@ -74,5 +74,5 @@ func (s *TaskService) StopTask(subscriberID, subscriberPlatform string) error {
 		return nil
 	}
 
-	return fmt.Errorf("task not found for the given subscriber, maybe it finished running")
+	return fmt.Errorf("task not found for the given subscriber (maybe it finished running?)")
 }

@@ -42,7 +42,6 @@ func (fh *StorageHandler) UploadToBucket(fileName string) bool {
 	ctx := context.Background()
 	file, err := os.Open(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
-		//Log
 		log.Println(err)
 		return false
 	}
@@ -111,6 +110,6 @@ func (fh *StorageHandler) GetFileUrl(fileName string) string {
 func Delete(fileName string) {
 	err := os.Remove(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }

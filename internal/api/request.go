@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// Api task request dtos live here
+
 type RunInstagramTaskRequest struct {
 	IgUserId             string          `json:"igUserId"`
 	LongLivedAccessToken string          `json:"lAccessToken"`
