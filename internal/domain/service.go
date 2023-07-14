@@ -1,17 +1,17 @@
-package service
+package domain
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/Vaansh/gore/internal/database"
-	"github.com/Vaansh/gore/internal/domain"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
+	"log"
 	"sync"
 )
 
 type TaskService struct {
-	Tasks       map[string]*domain.Task
+	Tasks       map[string]*Task
 	StopChanMap map[string]chan struct{} // Map to store quit channels for each task
 	mutex       sync.Mutex
 	db          *sql.DB
@@ -24,14 +24,14 @@ func NewTaskService() (*TaskService, error) {
 	}
 
 	return &TaskService{
-		Tasks:       make(map[string]*domain.Task),
+		Tasks:       make(map[string]*Task),
 		StopChanMap: make(map[string]chan struct{}),
 		db:          db,
 	}, nil
 }
 
-func (s *TaskService) RunTask(channels, subscriberID, igPostTags string) error {
-	taskID := platform.INSTAGRAM.String() + subscriberID
+func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platform.Name, subscriberId string, subscriberPlatform platform.Name, metaData model.MetaData) error {
+	taskID := subscriberPlatform.String() + subscriberId
 
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -41,10 +41,12 @@ func (s *TaskService) RunTask(channels, subscriberID, igPostTags string) error {
 	}
 
 	stop := make(chan struct{})
-	plats := []platform.Name{platform.YOUTUBE}
-	chans := []string{channels}
-	task := domain.NewTask(chans, plats, subscriberID, platform.INSTAGRAM, model.MetaData{IgPostTags: igPostTags},
-		*database.NewUserRepository(s.db, subscriberID, platform.INSTAGRAM))
+	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, *database.NewUserRepository(s.db, subscriberId, subscriberPlatform))
+	if task == nil {
+		log.Println("Invalid task configuration received.")
+		return nil
+	}
+
 	s.Tasks[taskID] = task
 	s.StopChanMap[taskID] = stop
 

@@ -14,19 +14,17 @@ import (
 
 type InstagramSubscriber struct {
 	instagramId string
-	metadata    model.MetaData
+	hashtags    string
 	repository  database.UserRepository
 	client      *http.InstagramClient
 }
 
 func NewInstagramSubscriber(instagramId string, metadata model.MetaData, repository database.UserRepository) *InstagramSubscriber {
-	userId := util.Getenv("IG_USER_ID", true)
-	accessToken := util.Getenv("LONG_LIVED_ACCESS_TOKEN", true)
 	return &InstagramSubscriber{
 		instagramId: instagramId,
-		metadata:    metadata,
+		hashtags:    metadata.IgPostTags,
 		repository:  repository,
-		client:      http.NewInstagramClient(userId, accessToken),
+		client:      http.NewInstagramClient(metadata.IgUserId, metadata.IgLongLivedAccessToken),
 	}
 }
 
@@ -55,7 +53,7 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 			}
 
 			fileUrl := fileHandler.GetFileUrl(fileName)
-			ok = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.metadata.IgPostTags, strings.ToUpper(sourcePlatform.String())))
+			ok = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
 			if !ok {
 				break
 			}

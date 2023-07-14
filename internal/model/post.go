@@ -6,9 +6,12 @@ import (
 )
 
 type Post struct {
-	PostId, SourceId     string
-	tag, Caption, Author string
-	PlatformName         platform.Name
+	PostId       string        `json:"postId"`
+	SourceId     string        `json:"sourceId"`
+	Tag          string        `json:"tag"`
+	Caption      string        `json:"caption"`
+	Author       string        `json:"author"`
+	PlatformName platform.Name `json:"platformName"`
 }
 
 func NewPost(id, caption, author, sourceId string, platformName platform.Name) *Post {
