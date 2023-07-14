@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 )
 
 const (
@@ -61,10 +62,28 @@ func (fh *StorageHandler) UploadToBucket(fileName string) bool {
 	return true
 }
 
+func (fh *StorageHandler) DeleteFromBucket(fileName string) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %w", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	o := client.Bucket(fh.bucketName).Object(fileName)
+	if err := o.Delete(ctx); err != nil {
+		return fmt.Errorf("Object(%q).Delete: %w", fileName, err)
+	}
+
+	return nil
+}
+
 func (fh *StorageHandler) SaveYoutubeVideo(id string) bool {
 	videoLink, err := fh.youtubeClient.GetVideo(id)
 	if err != nil {
-		//Log
 		return false
 	}
 
@@ -95,6 +114,4 @@ func Delete(id string) {
 	err := os.Remove(fmt.Sprintf("%s/%s.mp4", DIRECTORY, id))
 	if err != nil {
 	}
-
-	fmt.Println("File deleted successfully!")
 }

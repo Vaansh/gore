@@ -1,13 +1,13 @@
 package subscriber
 
 import (
-	"fmt"
 	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/util"
+	"log"
 	"strings"
 	"time"
 )
@@ -57,11 +57,14 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 			fileUrl := fileHandler.GetFileUrl(fileName)
 			ok = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.metadata.IgPostTags, strings.ToUpper(sourcePlatform.String())))
 			if !ok {
-				fmt.Println("3")
 				break
 			}
 
-			fmt.Println("Persisting record to db")
+			err = fileHandler.DeleteFromBucket(fileName)
+			if err != nil {
+				log.Println(err)
+			}
+
 			err = s.repository.AddRecord(s.getTableName(), &post)
 			if err != nil {
 				break

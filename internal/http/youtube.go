@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/platform"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -24,7 +25,7 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post,
 
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return model.Post{}, err
 	}
 
@@ -33,7 +34,7 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post,
 	var response shortsListByChannelResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return model.Post{}, err
 	}
 
@@ -51,7 +52,7 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model
 	paginatedShorts := PaginatedShortsAPI(channelId)
 	resp, err := http.Get(paginatedShorts.String())
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, "", err
 	}
 
@@ -60,7 +61,7 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model
 	var response shortsListByChannelResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, "", err
 	}
 
@@ -103,7 +104,7 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 	paginatedVideos := c.PaginatedVideosAPI(channelID)
 	resp, err := http.Get(paginatedVideos.String())
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return "", err
 	}
 
@@ -112,7 +113,7 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 	var data map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return "", err
 	}
 

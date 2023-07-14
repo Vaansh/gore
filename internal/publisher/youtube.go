@@ -1,10 +1,10 @@
 package publisher
 
 import (
-	"fmt"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/util"
+	"log"
 	"time"
 )
 
@@ -22,11 +22,10 @@ func NewYoutubePublisher(channelId string) *YoutubePublisher {
 }
 
 func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) {
-	fmt.Println("Fetching Paginated shorts")
 	for {
 		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
 		if err != nil {
-			fmt.Println("FetchPaginatedShortsByChannel err")
+			log.Println("FetchPaginatedShortsByChannel err")
 		}
 
 		for _, post := range posts {
@@ -44,7 +43,6 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 		time.Sleep(10 * time.Second)
 	}
 
-	fmt.Println("Fetching New shorts")
 	var videosBuffer []string
 	for {
 		post, err := p.client.FetchLatestShortByChannel(p.channelId)

@@ -2,7 +2,6 @@ package http
 
 import (
 	"errors"
-	"fmt"
 	fb "github.com/huandu/facebook/v2"
 	"log"
 	"time"
@@ -21,13 +20,10 @@ func NewInstagramClient(userId, accessToken string) *InstagramClient {
 }
 
 func (c *InstagramClient) UploadReel(videoUrl, caption string) bool {
-	fmt.Println(videoUrl)
 	containerId, err := c.createReelsContainer(videoUrl, caption)
 	if err != nil {
 		return false
 	}
-
-	fmt.Println(containerId)
 
 	ok := c.backoffUntilContainerReady(containerId)
 	if !ok {
