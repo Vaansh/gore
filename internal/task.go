@@ -7,14 +7,14 @@ import (
 )
 
 type Task struct {
-	ID         string
+	Id         string
 	Publishers []publisher.Publisher
 	Subscriber subscriber.Subscriber
 }
 
-func NewTask(Id string, publishers []publisher.Publisher, subscriber subscriber.Subscriber) *Task {
+func NewTask(id string, publishers []publisher.Publisher, subscriber subscriber.Subscriber) *Task {
 	return &Task{
-		ID:         Id,
+		Id:         id,
 		Publishers: publishers,
 		Subscriber: subscriber,
 	}

@@ -55,7 +55,7 @@ func (tm *TaskPool) AddTask(publisherIds []string, sources []platform.Name, subs
 	if destination == platform.INSTAGRAM {
 		consumer := subscriber.NewInstagramSubscriber(subscriberId, repository)
 		task := NewTask(taskID, prods, consumer)
-		tm.Tasks[task.ID] = task
+		tm.Tasks[task.Id] = task
 	}
 
 	return nil
