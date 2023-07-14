@@ -1,49 +1,72 @@
 package publisher
 
 import (
-	"pubsub/pkg/client"
+	"github.com/Vaansh/gore/internal/http"
+	"github.com/Vaansh/gore/internal/model"
+	"github.com/Vaansh/gore/internal/util"
+	"log"
 	"time"
 )
 
-type YoutubeProducer struct {
-	ChannelID string
-	client    *client.YoutubeClient
+type YoutubePublisher struct {
+	channelId string
+	client    *http.YoutubeClient
 }
 
-func NewYoutubeProducer(channelID string) *YoutubeProducer {
-	return &YoutubeProducer{
-		ChannelID: channelID,
-		client:    client.NewYoutubeClient(client.ApiKey),
+func NewYoutubePublisher(channelId string) *YoutubePublisher {
+	apiKey := util.Getenv("YOUTUBE_API_KEY", true)
+	return &YoutubePublisher{
+		channelId: channelId,
+		client:    http.NewYoutubeClient(apiKey),
 	}
 }
 
-func (p *YoutubeProducer) PublishTo(c chan<- string) {
-	videos := p.client.FetchVideosByChannel(p.ChannelID)
-	for _, link := range videos {
-		c <- link
-	}
-
+func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) {
 	for {
-		latestVideoLink := p.client.FetchLatestVideoByChannel(p.ChannelID)
-
-		if !contains(videos, latestVideoLink) {
-			c <- latestVideoLink
-			videos = append(videos, latestVideoLink)
+		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
+		if err != nil {
+			log.Println("FetchPaginatedShortsByChannel err")
 		}
 
-		time.Sleep(3 * time.Hour)
+		for _, post := range posts {
+			select {
+			case c <- post:
+			case <-quit:
+				return
+			}
+		}
+
+		if nextPageToken == "" {
+			break
+		}
+
+		time.Sleep(10 * time.Second)
+	}
+
+	var videosBuffer []string
+	for {
+		post, err := p.client.FetchLatestShortByChannel(p.channelId)
+
+		if err != nil {
+		}
+
+		if !util.Contains(videosBuffer, post.PostId) {
+			select {
+			case c <- post:
+				videosBuffer = append(videosBuffer, post.PostId)
+			case <-quit:
+				return
+			}
+		}
+
+		if len(videosBuffer) == 50 {
+			videosBuffer = make([]string, 0)
+		}
+
+		time.Sleep(10 * time.Second)
 	}
 }
 
-func (p *YoutubeProducer) GetPublisherID() string {
-	return p.ChannelID
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+func (p *YoutubePublisher) GetPublisherId() string {
+	return p.channelId
 }

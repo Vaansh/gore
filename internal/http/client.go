@@ -1,12 +1,12 @@
-package client
+package http
 
 import (
 	"net/http"
 )
 
 type Client struct {
-	c      *http.Client
-	apiKey string
+	c   *http.Client
+	key string
 }
 
 func NewClient() *Client {
