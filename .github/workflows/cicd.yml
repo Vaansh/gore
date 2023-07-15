@@ -31,7 +31,7 @@ jobs:
         uses: SpicyPizza/create-envfile@v2.0
         with:
           file_name: .env
-          envkey_PROJECT_ID: $PROJECT_ID
+          envkey_PROJECT_ID: ${{ secrets.PROJECT_ID }}
           envkey_INSTANCE_CONNECTION_NAME: ${{ secrets.INSTANCE_CONNECTION_NAME }}
           envkey_DB_USER: ${{ secrets.DB_USER }}
           envkey_DB_NAME: ${{ secrets.DB_NAME }}
