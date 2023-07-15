@@ -10,8 +10,8 @@ on:
       - closed
 
 env:
+  REGION: northamerica-northeast1 # Montreal server
   SERVICE: gore
-  REGION: northamerica-northeast1
 
 jobs:
   cicd:
@@ -57,11 +57,15 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+
       - name: Deploy to Cloud Run
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
+        uses: google-github-actions/deploy-cloudrun@v0.2.1
         with:
-          credentials: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           image: ${{ secrets.DOCKER_USERNAME }}/gore:latest
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
