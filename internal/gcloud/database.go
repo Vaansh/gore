@@ -1,4 +1,4 @@
-package database
+package gcloud
 
 import (
 	"cloud.google.com/go/cloudsqlconn"
@@ -13,8 +13,8 @@ import (
 
 // Initialize db
 
-func InitDb() (*sql.DB, error) {
-	cfg := config.ReadDbConfig()
+func InitDatabase() (*sql.DB, error) {
+	cfg := config.ReadDatabaseConfig()
 
 	var (
 		dbUser                 = cfg.Username

@@ -1,13 +1,12 @@
 package subscriber
 
 import (
-	"github.com/Vaansh/gore/internal/database"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
+	"github.com/Vaansh/gore/internal/repository"
 	"github.com/Vaansh/gore/internal/util"
-	"log"
 	"strings"
 	"time"
 )
@@ -15,11 +14,11 @@ import (
 type InstagramSubscriber struct {
 	instagramId string
 	hashtags    string
-	repository  database.UserRepository
+	repository  repository.UserRepository
 	client      *http.InstagramClient
 }
 
-func NewInstagramSubscriber(instagramId string, metadata model.MetaData, repository database.UserRepository) *InstagramSubscriber {
+func NewInstagramSubscriber(instagramId string, metadata model.MetaData, repository repository.UserRepository) *InstagramSubscriber {
 	return &InstagramSubscriber{
 		instagramId: instagramId,
 		hashtags:    metadata.IgPostTags,
@@ -29,46 +28,47 @@ func NewInstagramSubscriber(instagramId string, metadata model.MetaData, reposit
 }
 
 func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
-	fileHandler := gcloud.NewStorageHandler()
 	for post := range c {
 		postId, author, sourcePlatform, caption := post.GetParams()
 		exists, err := s.repository.CheckIfRecordExists(s.getTableName(), &post)
 		if err != nil {
+			gcloud.LogWarning(err.Error())
 		}
 
 		if !exists {
-			ok := false
-			if sourcePlatform == platform.YOUTUBE {
-				ok = fileHandler.SaveYoutubeVideo(postId)
-			}
+			err := gcloud.SaveFile(postId, sourcePlatform)
 
-			if !ok {
+			if err != nil {
+				gcloud.LogError(err.Error())
 				break
 			}
 
 			fileName := sourcePlatform.String() + "_" + postId + ".mp4"
-			ok = fileHandler.UploadToBucket(fileName)
-			if !ok {
-				break
-			}
-
-			fileUrl := fileHandler.GetFileUrl(fileName)
-			ok = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
-			if !ok {
-				break
-			}
-
-			err = fileHandler.DeleteFromBucket(fileName)
+			err = gcloud.UploadToBucket(fileName)
 			if err != nil {
-				log.Println(err)
+				gcloud.LogError(err.Error())
+				break
+			}
+
+			fileUrl := gcloud.GetFileUrl(fileName)
+			err = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
+			if err != nil {
+				gcloud.LogError(err.Error())
+				break
+			}
+
+			err = gcloud.DeleteFromBucket(fileName)
+			if err != nil {
+				gcloud.LogWarning(err.Error())
 			}
 
 			err = s.repository.AddRecord(s.getTableName(), &post)
 			if err != nil {
+				gcloud.LogError(err.Error())
 				break
 			}
 
-			gcloud.Delete(fileName)
+			gcloud.DeleteFile(fileName)
 			time.Sleep(30 * time.Minute)
 		}
 	}
@@ -79,5 +79,5 @@ func (s *InstagramSubscriber) GetSubscriberId() string {
 }
 
 func (s *InstagramSubscriber) getTableName() string {
-	return platform.INSTAGRAM.String() + "_" + s.instagramId
+	return gore.INSTAGRAM.String() + "_" + s.instagramId
 }

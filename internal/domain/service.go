@@ -3,48 +3,59 @@ package domain
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Vaansh/gore/internal/database"
+	"github.com/Vaansh/gore"
+	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
-	"log"
+	"github.com/Vaansh/gore/internal/repository"
 	"sync"
+)
+
+// Task service is a singleton
+
+var (
+	once                sync.Once
+	taskServiceInstance *TaskService
 )
 
 type TaskService struct {
 	Tasks       map[string]*Task
 	StopChanMap map[string]chan struct{} // Map to store quit channels for each task
-	mutex       sync.Mutex
 	db          *sql.DB
 }
 
-func NewTaskService() (*TaskService, error) {
-	db, err := database.InitDb()
-	if err != nil {
-		return nil, fmt.Errorf("error connecting to the database: %w", err)
-	}
+func NewTaskService() *TaskService {
+	once.Do(func() {
+		db, err := gcloud.InitDatabase()
+		if err != nil {
+			gcloud.LogFatal("unable to connect to repository")
+		}
 
-	return &TaskService{
-		Tasks:       make(map[string]*Task),
-		StopChanMap: make(map[string]chan struct{}),
-		db:          db,
-	}, nil
+		taskServiceInstance = &TaskService{
+			Tasks:       make(map[string]*Task),
+			StopChanMap: make(map[string]chan struct{}),
+			db:          db,
+		}
+	})
+	return taskServiceInstance
 }
 
-func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platform.Name, subscriberId string, subscriberPlatform platform.Name, metaData model.MetaData) error {
+func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []gore.Platform, subscriberId string, subscriberPlatform gore.Platform, metaData model.MetaData) error {
 	taskID := subscriberPlatform.String() + subscriberId
-
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
 
 	if _, ok := s.Tasks[taskID]; ok {
 		return fmt.Errorf("task already running for the given subscriber")
 	}
 
+	repo, err := repository.NewPostgresUserRepository(s.db, subscriberId, subscriberPlatform)
+	if err != nil {
+		return err
+	}
+
 	stop := make(chan struct{})
-	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, *database.NewUserRepository(s.db, subscriberId, subscriberPlatform))
+
+	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, repo)
 	if task == nil {
-		log.Println("Invalid task configuration received.")
-		return nil
+		return fmt.Errorf("invalid task configuration received")
 	}
 
 	s.Tasks[taskID] = task
@@ -52,8 +63,6 @@ func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platfo
 
 	go func() {
 		task.Run(stop)
-		s.mutex.Lock()
-		defer s.mutex.Unlock()
 		delete(s.Tasks, taskID)
 		delete(s.StopChanMap, taskID)
 	}()
@@ -63,9 +72,6 @@ func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platfo
 
 func (s *TaskService) StopTask(subscriberID, subscriberPlatform string) error {
 	taskID := subscriberPlatform + subscriberID
-
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
 
 	if stop, ok := s.StopChanMap[taskID]; ok {
 		close(stop)

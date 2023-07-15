@@ -1,10 +1,10 @@
 package publisher
 
 import (
+	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/util"
-	"log"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 	for {
 		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
 		if err != nil {
-			log.Println(err)
+			gcloud.LogWarning(err.Error())
 		}
 
 		for _, post := range posts {
@@ -46,8 +46,8 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 	var videosBuffer []string
 	for {
 		post, err := p.client.FetchLatestShortByChannel(p.channelId)
-
 		if err != nil {
+			gcloud.LogWarning(err.Error())
 		}
 
 		if !util.Contains(videosBuffer, post.PostId) {

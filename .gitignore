@@ -27,6 +27,6 @@ _testmain.go
 /goinstall.log
 /last-change
 misc/**
+log/*-*.log
 data/**.mp4
-log/**.log
 stone-album-*.json

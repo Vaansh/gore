@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/Vaansh/gore/internal/platform"
+	gore "github.com/Vaansh/gore"
 	"time"
 )
 
@@ -12,7 +12,7 @@ type RunInstagramTaskRequest struct {
 	LongLivedAccessToken string          `json:"lAccessToken"`
 	Hashtags             string          `json:"igPostTags"`
 	PublisherIds         []string        `json:"publisherIds"`
-	Sources              []platform.Name `json:"sources"`
+	Sources              []gore.Platform `json:"sources"`
 	SubscriberId         string          `json:"subscriberId"`
 	Frequency            time.Duration   `json:"frequency,string"`
 }

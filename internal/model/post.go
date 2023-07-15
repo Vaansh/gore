@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/Vaansh/gore/internal/platform"
+	"github.com/Vaansh/gore"
 )
 
 type Post struct {
@@ -11,10 +11,10 @@ type Post struct {
 	Tag          string        `json:"tag"`
 	Caption      string        `json:"caption"`
 	Author       string        `json:"author"`
-	PlatformName platform.Name `json:"platformName"`
+	PlatformName gore.Platform `json:"platformName"`
 }
 
-func NewPost(id, caption, author, sourceId string, platformName platform.Name) *Post {
+func NewPost(id, caption, author, sourceId string, platformName gore.Platform) *Post {
 	return &Post{
 		PostId:       id,
 		Caption:      caption,
@@ -24,7 +24,7 @@ func NewPost(id, caption, author, sourceId string, platformName platform.Name) *
 	}
 }
 
-func (p Post) GetParams() (string, string, platform.Name, string) {
+func (p Post) GetParams() (string, string, gore.Platform, string) {
 	return p.PostId, p.Author, p.PlatformName, p.Caption
 }
 

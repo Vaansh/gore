@@ -1,9 +1,8 @@
 package http
 
 import (
-	"errors"
+	"fmt"
 	fb "github.com/huandu/facebook/v2"
-	"log"
 	"time"
 )
 
@@ -19,23 +18,23 @@ func NewInstagramClient(userId, accessToken string) *InstagramClient {
 	}
 }
 
-func (c *InstagramClient) UploadReel(videoUrl, caption string) bool {
+func (c *InstagramClient) UploadReel(videoUrl, caption string) error {
 	containerId, err := c.createReelsContainer(videoUrl, caption)
 	if err != nil {
-		return false
+		return err
 	}
 
-	ok := c.backoffUntilContainerReady(containerId)
-	if !ok {
-		return false
+	err = c.backoffUntilContainerReady(containerId)
+	if err != nil {
+		return err
 	}
 
-	ok = c.uploadReelsByContainer(containerId)
-	if !ok {
-		return false
+	err = c.uploadReelsByContainer(containerId)
+	if err != nil {
+		return err
 	}
 
-	return ok
+	return nil
 }
 
 func (c *InstagramClient) createReelsContainer(videoUrl, caption string) (string, error) {
@@ -47,40 +46,36 @@ func (c *InstagramClient) createReelsContainer(videoUrl, caption string) (string
 	})
 
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	containerId, ok := res["id"]
 	if !ok {
-		log.Println(res)
-		return "", errors.New("invalid response")
+		return "", fmt.Errorf("no 'id' field found for videoUrl (%s) response received: %s", videoUrl, res)
 	}
 
 	return containerId.(string), nil
 }
 
-func (c *InstagramClient) uploadReelsByContainer(containerId string) bool {
+func (c *InstagramClient) uploadReelsByContainer(containerId string) error {
 	res, err := fb.Post(c.userId+"/media_publish", fb.Params{
 		"creation_id":  containerId,
 		"access_token": c.accessToken,
 	})
 
 	if err != nil {
-		log.Println(err)
-		return false
+		return err
 	}
 
 	_, ok := res["id"]
 	if !ok {
-		log.Println(err)
-		return false
+		return fmt.Errorf("no 'id' field found for containerId (%s) response received: %s", containerId, res)
 	}
 
-	return true
+	return nil
 }
 
-func (c *InstagramClient) backoffUntilContainerReady(containerId string) bool {
+func (c *InstagramClient) backoffUntilContainerReady(containerId string) error {
 	for i := 0; i <= 20; i++ {
 		res, err := fb.Get(containerId, fb.Params{
 			"fields":       "status_code",
@@ -88,21 +83,19 @@ func (c *InstagramClient) backoffUntilContainerReady(containerId string) bool {
 		})
 
 		if err != nil {
-			log.Println(err)
-			return false
+			return err
 		}
 
 		statusCode, ok := res["status_code"]
 		if !ok {
-			log.Println(res)
-			return false
+			return fmt.Errorf("no 'status_code' field found for %s response received: %s", containerId, res)
 		}
 
 		if statusCode == "FINISHED" {
-			return true
+			return nil
 		}
 
 		time.Sleep(1 * time.Minute)
 	}
-	return false
+	return fmt.Errorf("timeout error")
 }

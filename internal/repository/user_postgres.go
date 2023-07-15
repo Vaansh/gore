@@ -1,28 +1,25 @@
-package database
+package repository
 
 import (
 	"database/sql"
 	"fmt"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
-	"log"
 )
 
-// Repository pattern
-
-type UserRepository struct {
+type PostgresUserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB, id string, platform platform.Name) *UserRepository {
-	r := &UserRepository{db: db}
+func NewPostgresUserRepository(db *sql.DB, id string, platform gore.Platform) (*PostgresUserRepository, error) {
+	r := &PostgresUserRepository{db: db}
 	if err := r.createUser(model.NewUser(id, platform)); err != nil {
-		return nil
+		return nil, err
 	}
-	return r
+	return r, nil
 }
 
-func (r *UserRepository) createUser(user *model.User) error {
+func (r *PostgresUserRepository) createUser(user *model.User) error {
 	tableName := getTableName(user)
 	query := fmt.Sprintf(`
         CREATE TABLE IF NOT EXISTS %s (
@@ -34,13 +31,12 @@ func (r *UserRepository) createUser(user *model.User) error {
             PRIMARY KEY (source_id, post_id)
         );`, tableName)
 	if _, err := r.db.Exec(query); err != nil {
-		log.Fatalf(err.Error())
 		return err
 	}
 	return nil
 }
 
-func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
+func (r *PostgresUserRepository) AddRecord(tableName string, post *model.Post) error {
 	query := fmt.Sprintf(`
 		INSERT INTO %s (platform, source_id, author_name, post_id) 
 		VALUES ($1, $2, $3, $4);`, tableName)
@@ -50,7 +46,7 @@ func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
 	return nil
 }
 
-func (r *UserRepository) CheckIfRecordExists(tableName string, post *model.Post) (bool, error) {
+func (r *PostgresUserRepository) CheckIfRecordExists(tableName string, post *model.Post) (bool, error) {
 	var count int
 	query := fmt.Sprintf(`
 		SELECT COUNT(*) 
