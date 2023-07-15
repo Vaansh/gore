@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Remove based on OS type
+# remove files based on operating system type
 if [[ "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "darwin"* ]]; then
   rm ../data/*.mp4
   rm ../log/*.log
