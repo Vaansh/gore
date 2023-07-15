@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
 	"log"
 	"net/http"
 	"net/url"
@@ -45,7 +45,7 @@ func (c *YoutubeClient) FetchLatestShortByChannel(channelId string) (model.Post,
 	author, err := c.FetchChannelName(channelId)
 	if err != nil {
 	}
-	return *model.NewPost(response.Items[0].Shorts[0].VideoID, response.Items[0].Shorts[0].Title, author, channelId, platform.YOUTUBE), nil
+	return *model.NewPost(response.Items[0].Shorts[0].VideoID, response.Items[0].Shorts[0].Title, author, channelId, go_pubsub.YOUTUBE), nil
 }
 
 func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model.Post, string, error) {
@@ -74,7 +74,7 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model
 
 	for _, item := range response.Items {
 		for _, short := range item.Shorts {
-			posts = append(posts, *model.NewPost(short.VideoID, short.Title, author, channelId, platform.YOUTUBE))
+			posts = append(posts, *model.NewPost(short.VideoID, short.Title, author, channelId, go_pubsub.YOUTUBE))
 		}
 		nextPageToken = item.NextPageToken
 	}

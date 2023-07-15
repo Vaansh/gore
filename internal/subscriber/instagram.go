@@ -1,11 +1,11 @@
 package subscriber
 
 import (
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
 	"github.com/Vaansh/gore/internal/util"
 	"log"
 	"strings"
@@ -38,7 +38,7 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 
 		if !exists {
 			ok := false
-			if sourcePlatform == platform.YOUTUBE {
+			if sourcePlatform == go_pubsub.YOUTUBE {
 				ok = fileHandler.SaveYoutubeVideo(postId)
 			}
 
@@ -79,5 +79,5 @@ func (s *InstagramSubscriber) GetSubscriberId() string {
 }
 
 func (s *InstagramSubscriber) getTableName() string {
-	return platform.INSTAGRAM.String() + "_" + s.instagramId
+	return go_pubsub.INSTAGRAM.String() + "_" + s.instagramId
 }

@@ -28,7 +28,7 @@ func NewStorageHandler() *StorageHandler {
 	cfg := config.ReadBucketConfig()
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(cfg.CredentialsPath))
 	if err != nil {
-		log.Fatalf("Failed to create service: %v", err)
+		log.Fatalf("Failed to create api: %v", err)
 	}
 
 	return &StorageHandler{

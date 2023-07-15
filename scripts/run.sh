@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build the program
-go build -o ../main ../cmd/service
+go build -o ../main ../cmd/api
 
 # unix
 if [[ "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "darwin"* ]]; then

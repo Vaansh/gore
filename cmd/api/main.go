@@ -1,29 +1,32 @@
 package main
 
 import (
+	"github.com/Vaansh/gore/internal/api"
 	"github.com/Vaansh/gore/internal/domain"
-	"github.com/Vaansh/gore/internal/rest"
 	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 )
 
 func main() {
-	// create instance of the task service
+	// create instance of the task api
 	taskService, err := domain.NewTaskService()
 	if err != nil {
-		log.Fatalf("Error initializing task service: %s", err)
+		log.Fatalf("Error initializing task api: %s", err)
 	}
+	taskHandler := api.NewTaskHandler(taskService)
 
 	// server config
-	serverPort := "8080"
+	serverPort := ":8080"
 	router := gin.Default()
-	taskHandler := rest.NewTaskHandler(taskService)
 
 	// register routes
+	router.Use(api.AuthMiddleware)
 	router.POST("/tasks/ig", taskHandler.RunInstagramTask)
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
 	log.Printf("Server listening on port %s\n", serverPort)
-	log.Fatal(http.ListenAndServe(":"+serverPort, router))
+	err = router.Run(serverPort)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 }

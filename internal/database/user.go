@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
 	"log"
 )
 
@@ -14,7 +14,7 @@ type UserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB, id string, platform platform.Name) *UserRepository {
+func NewUserRepository(db *sql.DB, id string, platform go_pubsub.Name) *UserRepository {
 	r := &UserRepository{db: db}
 	if err := r.createUser(model.NewUser(id, platform)); err != nil {
 		return nil

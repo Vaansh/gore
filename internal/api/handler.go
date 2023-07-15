@@ -1,10 +1,9 @@
-package rest
+package api
 
 import (
-	"github.com/Vaansh/gore/internal/api"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/domain"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -20,20 +19,20 @@ func NewTaskHandler(taskService *domain.TaskService) *TaskHandler {
 }
 
 func (th *TaskHandler) RunInstagramTask(c *gin.Context) {
-	var request api.RunInstagramTaskRequest
+	var request RunInstagramTaskRequest
 	if err := c.ShouldBindJSON(&request); err != nil || len(request.PublisherIds) != len(request.Sources) {
-		c.JSON(http.StatusBadRequest, api.TaskResponse{Success: false, Error: err.Error()})
+		c.JSON(http.StatusBadRequest, TaskResponse{Success: false, Error: err.Error()})
 		return
 	}
 
-	err := th.TaskService.RunTask(request.PublisherIds, request.Sources, request.SubscriberId, platform.INSTAGRAM,
+	err := th.TaskService.RunTask(request.PublisherIds, request.Sources, request.SubscriberId, go_pubsub.INSTAGRAM,
 		*model.NewInstagramMetaData(request.IgUserId, request.LongLivedAccessToken, request.Hashtags, request.Frequency))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, api.TaskResponse{Success: false, Error: err.Error()})
+		c.JSON(http.StatusBadRequest, TaskResponse{Success: false, Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.TaskResponse{Success: true})
+	c.JSON(http.StatusOK, TaskResponse{Success: true})
 }
 
 func (th *TaskHandler) StopTask(c *gin.Context) {
@@ -42,8 +41,9 @@ func (th *TaskHandler) StopTask(c *gin.Context) {
 
 	err := th.TaskService.StopTask(subscriberId, subscriberPlatform)
 	if err != nil {
-		c.JSON(http.StatusNotFound, api.TaskResponse{Success: false, Error: err.Error()})
+		c.JSON(http.StatusNotFound, TaskResponse{Success: false, Error: err.Error()})
+		return
 	}
 
-	c.JSON(http.StatusOK, api.TaskResponse{Success: true})
+	c.JSON(http.StatusOK, TaskResponse{Success: true})
 }

@@ -3,10 +3,9 @@ package domain
 import (
 	"database/sql"
 	"fmt"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/model"
-	"github.com/Vaansh/gore/internal/platform"
-	"log"
 	"sync"
 )
 
@@ -30,7 +29,7 @@ func NewTaskService() (*TaskService, error) {
 	}, nil
 }
 
-func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platform.Name, subscriberId string, subscriberPlatform platform.Name, metaData model.MetaData) error {
+func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []go_pubsub.Name, subscriberId string, subscriberPlatform go_pubsub.Name, metaData model.MetaData) error {
 	taskID := subscriberPlatform.String() + subscriberId
 
 	s.mutex.Lock()
@@ -43,8 +42,7 @@ func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []platfo
 	stop := make(chan struct{})
 	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, *database.NewUserRepository(s.db, subscriberId, subscriberPlatform))
 	if task == nil {
-		log.Println("Invalid task configuration received.")
-		return nil
+		return fmt.Errorf("invalid task configuration received")
 	}
 
 	s.Tasks[taskID] = task

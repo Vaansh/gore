@@ -1,4 +1,4 @@
-package platform
+package go_pubsub
 
 type Name string
 
