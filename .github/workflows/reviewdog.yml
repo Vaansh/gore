@@ -13,7 +13,7 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
           level: warning
-          golangci_lint_flags: "--config=.github/.golangci.yml ./internal"
+          golangci_lint_flags: "--config=.github/.golangci.yml"
 
   golangci-lint-platform:
     name: runner / golangci-lint-platform
@@ -30,7 +30,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           tool_name: golangci-lint-${{ matrix.platform }}
           level: warning
-          golangci_lint_flags: "--config=.github/.golangci.yml ./internal"
+          golangci_lint_flags: "--config=.github/.golangci.yml"
 
   golangci-lint-github-pr-review:
     name: runner / golangci-lint (github-pr-review)
@@ -41,7 +41,6 @@ jobs:
       - name: golangci-lint w/ github-pr-review
         uses: ./
         with:
-          golangci_lint_flags: "./internal"
           tool_name: "golangci-lint-github-pr-review"
           reporter: "github-pr-review"
 
@@ -54,7 +53,6 @@ jobs:
       - name: golangci-lint w/ github-check
         uses: ./
         with:
-          golangci_lint_flags: "./internal"
           tool_name: "golangci-lint-github-check"
           level: warning
           reporter: "github-check"
@@ -67,8 +65,7 @@ jobs:
       - name: golangci-lint (workdir)
         uses: ./
         with:
-          workdir: "./internal"
-          golangci_lint_flags: ""
+          workdir: "."
           tool_name: "golangci-lint-workdir"
           level: warning
           reporter: "github-check"
@@ -86,7 +83,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           tool_name: "golangci-lint-all-in-one"
           level: warning
-          golangci_lint_flags: "--enable-all --exclude-use-default=false ./internal"
+          golangci_lint_flags: "--enable-all --exclude-use-default=false"
 
   govet:
     name: runner / govet
@@ -98,7 +95,6 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.github_token }}
-          golangci_lint_flags: "--disable-all -E govet ./internal"
           tool_name: govet
 
   staticcheck:
@@ -111,7 +107,7 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.github_token }}
-          golangci_lint_flags: "--disable-all -E staticcheck ./internal"
+          golangci_lint_flags: "--disable-all -E staticcheck ."
           tool_name: staticcheck
 
   golint:
@@ -124,7 +120,7 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.github_token }}
-          golangci_lint_flags: "--disable-all -E golint ./internal"
+          golangci_lint_flags: "--disable-all -E golint ."
           tool_name: golint
           level: warning
 
@@ -138,7 +134,7 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.github_token }}
-          golangci_lint_flags: "--disable-all -E errcheck ./internal"
+          golangci_lint_flags: "--disable-all -E errcheck ."
           tool_name: errcheck
           level: warning
 
@@ -152,6 +148,6 @@ jobs:
         uses: ./
         with:
           github_token: ${{ secrets.github_token }}
-          golangci_lint_flags: "--disable-all -E misspell ./internal"
+          golangci_lint_flags: "--disable-all -E misspell ."
           tool_name: misspell
           level: info
