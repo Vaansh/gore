@@ -3,7 +3,7 @@ name: CICD
 on:
   push:
     branches:
-      - main
+      - '*'
   pull_request:
     types:
       - opened
@@ -12,7 +12,6 @@ on:
 env:
   SERVICE: gore
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGION: northamerica-northeast1 # Montreal server
 
 jobs:
   cicd:
@@ -21,14 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Check if PR was merged
-        run: |
-          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
-            echo "PR was merged."
-          else
-            echo "PR was closed without merging."
-            exit 0
-          fi
+#      - name: Check if PR was merged
+#        run: |
+#          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+#            echo "PR was merged."
+#          else
+#            echo "PR was closed without merging."
+#            exit 0
+#          fi
 
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
@@ -67,22 +66,21 @@ jobs:
       - name: Tag Docker image for Docker Hub
         run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
-      # it is a private image on docker hub, hosted there just for my own reference
+      # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
       - name: Push Docker image to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
-      - name: Tag Docker image for GCR
-        run: docker tag gore gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+      # Push Docker image to DigitalOcean Container Registry
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DOCR_TOKEN }}
 
-      - name: Push Docker image to Google Container Registry (GCR)
-        run: |
-          gcloud auth configure-docker
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+      - name: Log in to DO Container Registry
+        run: doctl registry login --expiry-seconds 600
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        run: |
-          gcloud run deploy ${{ env.SERVICE }} \
-            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest \
-            --region ${{ env.REGION }} \
-            --platform managed
+      - name: Tag Docker image for DigitalOcean Container Registry
+        run: docker tag gore/gore registry.digitalocean.com/gore:latest
+
+      - name: Push Docker image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/registry.digitalocean.com/gore:latest
