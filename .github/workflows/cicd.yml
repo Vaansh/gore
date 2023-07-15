@@ -63,10 +63,10 @@ jobs:
       - name: Build Docker image
         run: docker build -t gore .
 
+      # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
       - name: Tag Docker image for Docker Hub
         run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
-      # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
       - name: Push Docker image to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
@@ -76,11 +76,11 @@ jobs:
         with:
           token: ${{ secrets.DOCR_TOKEN }}
 
-      - name: Log in to DO Container Registry
+      - name: Log in to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 600
 
       - name: Tag Docker image for DigitalOcean Container Registry
-        run: docker tag gore/gore registry.digitalocean.com/gore:latest
+        run: docker tag gore:latest registry.digitalocean.com/gore:latest
 
       - name: Push Docker image to DigitalOcean Container Registry
         run: docker push registry.digitalocean.com/registry.digitalocean.com/gore:latest
