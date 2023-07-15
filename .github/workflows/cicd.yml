@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - '*'
-  pull_request:
-    types:
-      - opened
-      - closed
 
 env:
   SERVICE: gore
@@ -21,14 +17,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Check if PR was merged
-        run: |
-          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
-            echo "PR was merged."
-          else
-            echo "PR was closed without merging."
-            exit 0
-          fi
+#      - name: Check if PR was merged
+#        run: |
+#          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+#            echo "PR was merged."
+#          else
+#            echo "PR was closed without merging."
+#            exit 0
+#          fi
 
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
@@ -80,7 +76,7 @@ jobs:
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
 
       - name: Configure kubectl
-          run: gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
+        run: gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
 
       - name: Deploy to GKE
         run: |
