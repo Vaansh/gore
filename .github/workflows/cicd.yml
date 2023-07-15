@@ -74,10 +74,15 @@ jobs:
         run: |
           gcloud auth configure-docker
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+          
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
 
-      - name: Configure kubectl
-        run: gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
-
-      - name: Deploy to GKE
-        run: |
-          kubectl set image deployment/${{ env.SERVICE }} ${{ env.SERVICE }}=gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+      - name: Deploy
+        run: |-
+          ./kustomize edit set image gcr.io/${{ env.PROJECT_ID }}/IMAGE:TAG=gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment/gore
+          kubectl get services -o wide
