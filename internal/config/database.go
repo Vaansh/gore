@@ -4,15 +4,15 @@ import (
 	"github.com/Vaansh/gore/internal/util"
 )
 
-type DBConfig struct {
+type DatabaseConfig struct {
 	Username   string
 	Password   string
 	Database   string
 	InstanceId string
 }
 
-func ReadDbConfig() *DBConfig {
-	config := &DBConfig{
+func ReadDatabaseConfig() *DatabaseConfig {
+	config := &DatabaseConfig{
 		Username:   util.Getenv("DB_USER", true),
 		Password:   util.Getenv("DB_PASS", true),
 		Database:   util.Getenv("DB_NAME", true),

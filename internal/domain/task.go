@@ -2,9 +2,9 @@ package domain
 
 import (
 	"github.com/Vaansh/gore"
-	"github.com/Vaansh/gore/internal/database"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/publisher"
+	"github.com/Vaansh/gore/internal/repository"
 	"github.com/Vaansh/gore/internal/subscriber"
 	"sync"
 )
@@ -16,7 +16,7 @@ type Task struct {
 	Quit       chan struct{}
 }
 
-func NewTask(publisherIds []string, sources []go_pubsub.Name, subscriberId string, destination go_pubsub.Name, metadata model.MetaData, repository database.UserRepository) *Task {
+func NewTask(publisherIds []string, sources []gore.Platform, subscriberId string, destination gore.Platform, metadata model.MetaData, repository repository.UserRepository) *Task {
 	id := string(destination) + subscriberId
 	if len(publisherIds) != len(sources) {
 		return nil
@@ -25,7 +25,7 @@ func NewTask(publisherIds []string, sources []go_pubsub.Name, subscriberId strin
 	publishers := make([]publisher.Publisher, len(publisherIds))
 	for i, id := range publisherIds {
 		switch sources[i] {
-		case go_pubsub.YOUTUBE:
+		case gore.YOUTUBE:
 			publishers[i] = publisher.NewYoutubePublisher(id)
 		default:
 			return nil
@@ -33,7 +33,7 @@ func NewTask(publisherIds []string, sources []go_pubsub.Name, subscriberId strin
 	}
 
 	var consumer subscriber.Subscriber = nil
-	if destination == go_pubsub.INSTAGRAM {
+	if destination == gore.INSTAGRAM {
 		consumer = subscriber.NewInstagramSubscriber(subscriberId, metadata, repository)
 	}
 

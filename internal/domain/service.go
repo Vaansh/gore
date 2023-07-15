@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/Vaansh/gore"
-	"github.com/Vaansh/gore/internal/database"
+	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/model"
-	"log"
+	"github.com/Vaansh/gore/internal/repository"
 	"sync"
 )
 
@@ -25,9 +25,9 @@ type TaskService struct {
 
 func NewTaskService() *TaskService {
 	once.Do(func() {
-		db, err := database.InitDb()
+		db, err := gcloud.InitDatabase()
 		if err != nil {
-			log.Fatalf("unable to connect to database")
+			gcloud.LogFatal("unable to connect to repository")
 		}
 
 		taskServiceInstance = &TaskService{
@@ -39,15 +39,21 @@ func NewTaskService() *TaskService {
 	return taskServiceInstance
 }
 
-func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []go_pubsub.Name, subscriberId string, subscriberPlatform go_pubsub.Name, metaData model.MetaData) error {
+func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []gore.Platform, subscriberId string, subscriberPlatform gore.Platform, metaData model.MetaData) error {
 	taskID := subscriberPlatform.String() + subscriberId
 
 	if _, ok := s.Tasks[taskID]; ok {
 		return fmt.Errorf("task already running for the given subscriber")
 	}
 
+	repo, err := repository.NewPostgresUserRepository(s.db, subscriberId, subscriberPlatform)
+	if err != nil {
+		return err
+	}
+
 	stop := make(chan struct{})
-	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, *database.NewUserRepository(s.db, subscriberId, subscriberPlatform))
+
+	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, repo)
 	if task == nil {
 		return fmt.Errorf("invalid task configuration received")
 	}

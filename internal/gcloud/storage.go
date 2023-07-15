@@ -4,49 +4,45 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
-	go_pubsub "github.com/Vaansh/gore"
+	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/config"
 	"github.com/kkdai/youtube/v2"
 	"google.golang.org/api/option"
 	"io"
-	"log"
 	"os"
 	"time"
 )
 
-const (
-	DIRECTORY = "data"
+var (
+	storageClient *storage.Client
+	bucketName    string
 )
 
-type StorageHandler struct {
-	storageClient *storage.Client
-	youtubeClient youtube.Client
-	bucketName    string
-}
+const (
+	LocalDataDirectory = "data"
+)
 
-func NewStorageHandler() *StorageHandler {
+func InitStorage() error {
+	var err error
 	ctx := context.Background()
-	cfg := config.ReadBucketConfig()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(cfg.CredentialsPath))
+	cfg := config.ReadStorageConfig()
+
+	storageClient, err = storage.NewClient(ctx, option.WithCredentialsFile(cfg.CredentialsPath))
 	if err != nil {
-		log.Fatalf("Failed to create api: %v", err)
+		LogFatal(fmt.Sprintf("Failed to create api: %v", err))
 	}
 
-	return &StorageHandler{
-		storageClient: client,
-		youtubeClient: youtube.Client{},
-		bucketName:    cfg.BucketName,
-	}
+	return nil
 }
 
-func (fh *StorageHandler) SaveFileCloud(fileName string) error {
+func UploadToBucket(fileName string) error {
 	ctx := context.Background()
-	file, err := os.Open(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
+	file, err := os.Open(fmt.Sprintf("%s/%s", LocalDataDirectory, fileName))
 	if err != nil {
 		return err
 	}
 
-	wc := fh.storageClient.Bucket(fh.bucketName).Object(fileName).NewWriter(ctx)
+	wc := storageClient.Bucket(bucketName).Object(fileName).NewWriter(ctx)
 	if _, err = io.Copy(wc, file); err != nil {
 		return err
 	}
@@ -58,7 +54,7 @@ func (fh *StorageHandler) SaveFileCloud(fileName string) error {
 	return nil
 }
 
-func (fh *StorageHandler) DeleteCloudFile(fileName string) error {
+func DeleteFromBucket(fileName string) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -69,7 +65,7 @@ func (fh *StorageHandler) DeleteCloudFile(fileName string) error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 
-	o := client.Bucket(fh.bucketName).Object(fileName)
+	o := client.Bucket(bucketName).Object(fileName)
 	if err := o.Delete(ctx); err != nil {
 		return fmt.Errorf("Object(%q).Delete: %w", fileName, err)
 	}
@@ -77,20 +73,21 @@ func (fh *StorageHandler) DeleteCloudFile(fileName string) error {
 	return nil
 }
 
-func (fh *StorageHandler) SaveFileLocal(id string, platform go_pubsub.Name) error {
-	if platform == go_pubsub.YOUTUBE {
-		videoLink, err := fh.youtubeClient.GetVideo(id)
+func SaveFile(id string, platform gore.Platform) error {
+	if platform == gore.YOUTUBE {
+		client := youtube.Client{}
+		videoLink, err := client.GetVideo(id)
 		if err != nil {
 			return err
 		}
 
 		formats := videoLink.Formats.WithAudioChannels()
-		stream, _, err := fh.youtubeClient.GetStream(videoLink, &formats[0])
+		stream, _, err := client.GetStream(videoLink, &formats[0])
 		if err != nil {
 			return err
 		}
 
-		file, err := os.Create(fmt.Sprintf("%s/yt_%s.mp4", DIRECTORY, id))
+		file, err := os.Create(fmt.Sprintf("%s/yt_%s.mp4", LocalDataDirectory, id))
 		if err != nil {
 			return err
 		}
@@ -102,13 +99,13 @@ func (fh *StorageHandler) SaveFileLocal(id string, platform go_pubsub.Name) erro
 	}
 }
 
-func DeleteLocalFile(fileName string) {
-	err := os.Remove(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
+func DeleteFile(fileName string) {
+	err := os.Remove(fmt.Sprintf("%s/%s", LocalDataDirectory, fileName))
 	if err != nil {
-		log.Println(err)
+		LogWarning(err.Error())
 	}
 }
 
-func (fh *StorageHandler) GetFileUrl(fileName string) string {
-	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", fh.bucketName, fileName)
+func GetFileUrl(fileName string) string {
+	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", bucketName, fileName)
 }

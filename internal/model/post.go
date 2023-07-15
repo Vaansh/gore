@@ -6,15 +6,15 @@ import (
 )
 
 type Post struct {
-	PostId       string         `json:"postId"`
-	SourceId     string         `json:"sourceId"`
-	Tag          string         `json:"tag"`
-	Caption      string         `json:"caption"`
-	Author       string         `json:"author"`
-	PlatformName go_pubsub.Name `json:"platformName"`
+	PostId       string        `json:"postId"`
+	SourceId     string        `json:"sourceId"`
+	Tag          string        `json:"tag"`
+	Caption      string        `json:"caption"`
+	Author       string        `json:"author"`
+	PlatformName gore.Platform `json:"platformName"`
 }
 
-func NewPost(id, caption, author, sourceId string, platformName go_pubsub.Name) *Post {
+func NewPost(id, caption, author, sourceId string, platformName gore.Platform) *Post {
 	return &Post{
 		PostId:       id,
 		Caption:      caption,
@@ -24,7 +24,7 @@ func NewPost(id, caption, author, sourceId string, platformName go_pubsub.Name) 
 	}
 }
 
-func (p Post) GetParams() (string, string, go_pubsub.Name, string) {
+func (p Post) GetParams() (string, string, gore.Platform, string) {
 	return p.PostId, p.Author, p.PlatformName, p.Caption
 }
 

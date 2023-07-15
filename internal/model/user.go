@@ -5,11 +5,11 @@ import (
 )
 
 type User struct {
-	Id           string         `json:"id"`
-	PlatformName go_pubsub.Name `json:"platformName"`
+	Id           string        `json:"id"`
+	PlatformName gore.Platform `json:"platformName"`
 }
 
-func NewUser(ID string, platform go_pubsub.Name) *User {
+func NewUser(ID string, platform gore.Platform) *User {
 	return &User{
 		Id:           ID,
 		PlatformName: platform,

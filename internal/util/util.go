@@ -16,7 +16,7 @@ func Getenv(k string, mustGet bool) string {
 
 	v := os.Getenv(k)
 	if mustGet && v == "" {
-		log.Fatalf("Fatal Error: %s environment variable not set.\n", k)
+		log.Fatalf(fmt.Sprintf("Fatal Error: %s environment variable not set.\n", k))
 	}
 	return v
 }

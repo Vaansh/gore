@@ -1,27 +1,27 @@
-package go_pubsub
+package gore
 
-type Name string
+type Platform string
 
 const (
-	YOUTUBE   Name = "yt"
-	INSTAGRAM Name = "ig"
+	YOUTUBE   Platform = "yt"
+	INSTAGRAM Platform = "ig"
 )
 
-func (n Name) FullName() string {
+func (n Platform) String() string {
 	if n == YOUTUBE {
-		return "YouTube"
+		return "yt"
 	} else if n == INSTAGRAM {
-		return "Instagram"
+		return "ig"
 	} else {
 		return ""
 	}
 }
 
-func (n Name) String() string {
+func (n Platform) OfficialName() string {
 	if n == YOUTUBE {
-		return "yt"
+		return "YouTube"
 	} else if n == INSTAGRAM {
-		return "ig"
+		return "Instagram"
 	} else {
 		return ""
 	}

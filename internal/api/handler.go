@@ -25,7 +25,7 @@ func (th *TaskHandler) RunInstagramTask(c *gin.Context) {
 		return
 	}
 
-	err := th.TaskService.RunTask(request.PublisherIds, request.Sources, request.SubscriberId, go_pubsub.INSTAGRAM,
+	err := th.TaskService.RunTask(request.PublisherIds, request.Sources, request.SubscriberId, gore.INSTAGRAM,
 		*model.NewInstagramMetaData(request.IgUserId, request.LongLivedAccessToken, request.Hashtags, request.Frequency))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, TaskResponse{Success: false, Error: err.Error()})

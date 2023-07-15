@@ -1,10 +1,8 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	fb "github.com/huandu/facebook/v2"
-	"log"
 	"time"
 )
 
@@ -48,14 +46,12 @@ func (c *InstagramClient) createReelsContainer(videoUrl, caption string) (string
 	})
 
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	containerId, ok := res["id"]
 	if !ok {
-		log.Println(res)
-		return "", errors.New("invalid response")
+		return "", fmt.Errorf("no 'id' field found for videoUrl (%s) response received: %s", videoUrl, res)
 	}
 
 	return containerId.(string), nil
@@ -73,7 +69,7 @@ func (c *InstagramClient) uploadReelsByContainer(containerId string) error {
 
 	_, ok := res["id"]
 	if !ok {
-		return fmt.Errorf("no 'id' field found for %s response received: %s", containerId, res)
+		return fmt.Errorf("no 'id' field found for containerId (%s) response received: %s", containerId, res)
 	}
 
 	return nil
