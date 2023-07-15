@@ -76,13 +76,28 @@ jobs:
           gcloud auth configure-docker
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
           
-      - name: Deploy to GKE
-        run: |
-          gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
+      # Set up Kustomize
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
 
+      # Deploy to GKE using gcloud CLI and kustomize
+      - name: Deploy
+        run: |-
+          # Get credentials for the GKE cluster
+          gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
+      
+          # Set environment variables for deployment
           export DEPLOYMENT_NAME=${{ env.SERVICE }}-deployment
           export SERVICE_NAME=${{ env.SERVICE }}-service
-
-          kubectl set image deployment/${DEPLOYMENT_NAME} ${DEPLOYMENT_NAME}=gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
+      
+          # Deploy the new image using kustomize
+          ./kustomize edit set image gcr.io/${{ env.PROJECT_ID }}/gore:TAG=gcr.io/${{ env.PROJECT_ID }}/$IMAGE:$GITHUB_SHA
+          ./kustomize build . | kubectl apply -f -
+      
+          # Wait for the deployment to complete
           kubectl rollout status deployment/${DEPLOYMENT_NAME}
+      
+          # Get information about the deployed service
           kubectl get services ${SERVICE_NAME}
