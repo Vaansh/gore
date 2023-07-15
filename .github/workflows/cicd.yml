@@ -73,7 +73,7 @@ jobs:
         run: doctl registry login --expiry-seconds 600
 
       - name: Tag Docker image for DigitalOcean Container Registry
-        run: docker tag gore:latest registry.digitalocean.com/gore:latest
+        run: docker tag gore:latest registry.digitalocean.com/gore/gore:latest
 
       - name: Push Docker image to DigitalOcean Container Registry
         run: docker push registry.digitalocean.com/gore/gore:latest
