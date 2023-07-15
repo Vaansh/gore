@@ -11,5 +11,5 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: golangci-lint
+      - name: Go Lint
         uses: reviewdog/action-golangci-lint@v2
