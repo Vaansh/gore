@@ -12,7 +12,7 @@ on:
 env:
   SERVICE: gore
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGION: northamerica-northeast1 # Montreal server
+  REGION: us-central1
 
 jobs:
   cicd:
@@ -79,10 +79,9 @@ jobs:
           gcloud auth configure-docker
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
 
-      - name: Deploy to Cloud Run
-        id: deploy
+      - name: Configure kubectl
+          run: gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
+
+      - name: Deploy to GKE
         run: |
-          gcloud run deploy ${{ env.SERVICE }} \
-            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest \
-            --region ${{ env.REGION }} \
-            --platform managed
+          kubectl set image deployment/${{ env.SERVICE }} ${{ env.SERVICE }}=gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:latest
