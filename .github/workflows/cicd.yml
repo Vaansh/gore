@@ -10,9 +10,9 @@ on:
       - closed
 
 env:
-  REGION: northamerica-northeast1 # Montreal server
   SERVICE: gore
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  REGION: northamerica-northeast1 # Montreal server
 
 jobs:
   cicd:
@@ -53,6 +53,7 @@ jobs:
       - name: Tag Docker image for Docker Hub
         run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
+      # it is a private image on docker hub, hosted there just for my own reference
       - name: Push Docker image to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 

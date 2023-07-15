@@ -24,7 +24,7 @@ func main() {
 
 	// server config
 	router := gin.Default()
-	serverPort := util.Getenv("SERVER_PORT", false)
+	serverPort := util.Getenv("PORT", false)
 	if serverPort == "" {
 		serverPort = "8080"
 	}
