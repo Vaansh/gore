@@ -54,7 +54,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
       - name: Deploy to App Engine
-        uses: GoogleCloudPlatform/github-actions/app-engine-deploy@main
+        uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           app_dir: /app
