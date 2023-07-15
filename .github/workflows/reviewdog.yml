@@ -1,6 +1,9 @@
+name: Lint
+
 on: [pull_request]
+
 jobs:
-  golangci-lint:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
