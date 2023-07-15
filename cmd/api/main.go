@@ -7,7 +7,7 @@ import (
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/util"
 	"github.com/gin-gonic/gin"
-)t
+)
 
 func main() {
 	if err := gcloud.InitLogger(); err != nil {
@@ -34,6 +34,8 @@ func main() {
 	router.POST("/tasks/ig", taskHandler.RunInstagramTask)
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
+	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
+	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
 	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
 	err := router.Run(":" + serverPort)
 	if err != nil {

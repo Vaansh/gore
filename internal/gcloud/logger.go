@@ -8,6 +8,7 @@ import (
 	"google.golang.org/api/option"
 	"log"
 	"os"
+	"time"
 )
 
 const (
@@ -24,26 +25,28 @@ var (
 	localErrorLogger   *log.Logger
 )
 
-// Helper function to create a log file.
+// Helper function to create a new log file.
 func openLogFile(filename string) (*os.File, error) {
-	return os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	return os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 }
 
 // Initializes local loggers.
 func initLocalLoggers() error {
-	file, err := openLogFile(fmt.Sprintf("%s/%s.log", LogDirectory, "info"))
+	currentTime := time.Now()
+	run := currentTime.Format("2006-01-02|3:4:5")
+	file, err := openLogFile(fmt.Sprintf("%s/%s-%s.log", LogDirectory, "info", run))
 	if err != nil {
 		return err
 	}
 	localInfoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 
-	file, err = openLogFile(fmt.Sprintf("%s/%s.log", LogDirectory, "warning"))
+	file, err = openLogFile(fmt.Sprintf("%s/%s-%s.log", LogDirectory, "warning", run))
 	if err != nil {
 		return err
 	}
 	localWarningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
 
-	file, err = openLogFile(fmt.Sprintf("%s/%s.log", LogDirectory, "error"))
+	file, err = openLogFile(fmt.Sprintf("%s/%s-%s.log", LogDirectory, "error", run))
 	if err != nil {
 		return err
 	}
