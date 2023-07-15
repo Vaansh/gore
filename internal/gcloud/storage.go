@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
+	go_pubsub "github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/config"
 	"github.com/kkdai/youtube/v2"
 	"google.golang.org/api/option"
@@ -38,29 +39,26 @@ func NewStorageHandler() *StorageHandler {
 	}
 }
 
-func (fh *StorageHandler) UploadToBucket(fileName string) bool {
+func (fh *StorageHandler) SaveFileCloud(fileName string) error {
 	ctx := context.Background()
 	file, err := os.Open(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
-		log.Println(err)
-		return false
+		return err
 	}
 
 	wc := fh.storageClient.Bucket(fh.bucketName).Object(fileName).NewWriter(ctx)
 	if _, err = io.Copy(wc, file); err != nil {
-		log.Println(err)
-		return false
+		return err
 	}
 
 	if err := wc.Close(); err != nil {
-		log.Println(err)
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
-func (fh *StorageHandler) DeleteFromBucket(fileName string) error {
+func (fh *StorageHandler) DeleteCloudFile(fileName string) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -79,37 +77,38 @@ func (fh *StorageHandler) DeleteFromBucket(fileName string) error {
 	return nil
 }
 
-func (fh *StorageHandler) SaveYoutubeVideo(id string) bool {
-	videoLink, err := fh.youtubeClient.GetVideo(id)
-	if err != nil {
-		return false
-	}
+func (fh *StorageHandler) SaveFileLocal(id string, platform go_pubsub.Name) error {
+	if platform == go_pubsub.YOUTUBE {
+		videoLink, err := fh.youtubeClient.GetVideo(id)
+		if err != nil {
+			return err
+		}
 
-	formats := videoLink.Formats.WithAudioChannels()
-	stream, _, err := fh.youtubeClient.GetStream(videoLink, &formats[0])
-	if err != nil {
-		return false
-	}
+		formats := videoLink.Formats.WithAudioChannels()
+		stream, _, err := fh.youtubeClient.GetStream(videoLink, &formats[0])
+		if err != nil {
+			return err
+		}
 
-	file, err := os.Create(fmt.Sprintf("%s/yt_%s.mp4", DIRECTORY, id))
-	if err != nil {
-		return false
-	}
+		file, err := os.Create(fmt.Sprintf("%s/yt_%s.mp4", DIRECTORY, id))
+		if err != nil {
+			return err
+		}
 
-	_, err = io.Copy(file, stream)
-	if err != nil {
-		return false
+		_, err = io.Copy(file, stream)
+		return err // returns nil if no error
+	} else {
+		return fmt.Errorf("platform (%s) file saving not supported", platform)
 	}
-	return true
 }
 
-func (fh *StorageHandler) GetFileUrl(fileName string) string {
-	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", fh.bucketName, fileName)
-}
-
-func Delete(fileName string) {
+func DeleteLocalFile(fileName string) {
 	err := os.Remove(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func (fh *StorageHandler) GetFileUrl(fileName string) string {
+	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", fh.bucketName, fileName)
 }

@@ -34,41 +34,43 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 		postId, author, sourcePlatform, caption := post.GetParams()
 		exists, err := s.repository.CheckIfRecordExists(s.getTableName(), &post)
 		if err != nil {
+			log.Println(err)
 		}
 
 		if !exists {
-			ok := false
-			if sourcePlatform == go_pubsub.YOUTUBE {
-				ok = fileHandler.SaveYoutubeVideo(postId)
-			}
+			err := fileHandler.SaveFileLocal(postId, sourcePlatform)
 
-			if !ok {
+			if err != nil {
+				log.Println(err)
 				break
 			}
 
 			fileName := sourcePlatform.String() + "_" + postId + ".mp4"
-			ok = fileHandler.UploadToBucket(fileName)
-			if !ok {
+			err = fileHandler.SaveFileCloud(fileName)
+			if err != nil {
+				log.Println(err)
 				break
 			}
 
 			fileUrl := fileHandler.GetFileUrl(fileName)
-			ok = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
-			if !ok {
+			err = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
+			if err != nil {
+				log.Println(err)
 				break
 			}
 
-			err = fileHandler.DeleteFromBucket(fileName)
+			err = fileHandler.DeleteCloudFile(fileName)
 			if err != nil {
 				log.Println(err)
 			}
 
 			err = s.repository.AddRecord(s.getTableName(), &post)
 			if err != nil {
+				log.Println(err)
 				break
 			}
 
-			gcloud.Delete(fileName)
+			gcloud.DeleteLocalFile(fileName)
 			time.Sleep(30 * time.Minute)
 		}
 	}
