@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	cloud.google.com/go/cloudsqlconn v1.4.0
+	cloud.google.com/go/logging v1.7.0
 	cloud.google.com/go/storage v1.31.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/huandu/facebook/v2 v2.7.0
@@ -18,7 +19,6 @@ require (
 	cloud.google.com/go/compute v1.20.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.0 // indirect
-	cloud.google.com/go/logging v1.7.0 // indirect
 	cloud.google.com/go/longrunning v0.4.2 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect

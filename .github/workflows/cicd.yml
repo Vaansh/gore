@@ -37,8 +37,13 @@ jobs:
           envkey_PROJECT_ID: ${{ env.PROJECT_ID }}
           envkey_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           envkey_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          envkey_SERVER_PORT: "8080"
           envkey_API_AUTH_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
+
+      - name: Create credentials json file
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0

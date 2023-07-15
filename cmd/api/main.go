@@ -24,9 +24,9 @@ func main() {
 
 	// server config
 	router := gin.Default()
-	serverPort := util.Getenv("PORT", false)
-	if serverPort == "" {
-		serverPort = "8080"
+	port := util.Getenv("PORT", false)
+	if port == "" {
+		port = "8080"
 	}
 
 	// register routes
@@ -34,8 +34,8 @@ func main() {
 	router.POST("/tasks/ig", taskHandler.RunInstagramTask)
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
-	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
-	err := router.Run(":" + serverPort)
+	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", port))
+	err := router.Run(":" + port)
 	if err != nil {
 		gcloud.LogFatal(err.Error())
 	}
