@@ -8,6 +8,8 @@ import (
 	"log"
 )
 
+// Repository pattern
+
 type UserRepository struct {
 	db *sql.DB
 }
@@ -39,7 +41,9 @@ func (r *UserRepository) createUser(user *model.User) error {
 }
 
 func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
-	query := fmt.Sprintf("INSERT INTO %s (platform, source_id, author_name, post_id) VALUES ($1, $2, $3, $4);", tableName)
+	query := fmt.Sprintf(`
+		INSERT INTO %s (platform, source_id, author_name, post_id) 
+		VALUES ($1, $2, $3, $4);`, tableName)
 	if _, err := r.db.Exec(query, post.PlatformName, post.SourceId, post.Author, post.PostId); err != nil {
 		return err
 	}
@@ -48,7 +52,10 @@ func (r *UserRepository) AddRecord(tableName string, post *model.Post) error {
 
 func (r *UserRepository) CheckIfRecordExists(tableName string, post *model.Post) (bool, error) {
 	var count int
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE platform = $1 AND source_id = $2 AND post_id = $3;", tableName)
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) 
+		FROM %s 
+		WHERE platform = $1 AND source_id = $2 AND post_id = $3;`, tableName)
 	if err := r.db.QueryRow(query, post.PlatformName, post.SourceId, post.PostId).Scan(&count); err != nil {
 		return false, err
 	}

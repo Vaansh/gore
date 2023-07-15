@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Remove based on OS type
+# build the program
+go build -o ../main ../cmd/service
+
+# unix
 if [[ "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "darwin"* ]]; then
-  rm ../data/*.mp4
-  rm ../log/*.log
+  cd ..
+  ./main
+# windows
 elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
-  del ..\data\*.mp4
-  del ..\log\*.log
+  cd ..
+  main.exe
 else
   echo "Unknown operating system"
 fi

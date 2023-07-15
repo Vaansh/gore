@@ -82,7 +82,8 @@ func (c *YoutubeClient) FetchPaginatedShortsByChannel(channelId string) ([]model
 	return posts, nextPageToken, nil
 }
 
-// Videos
+// NOTE: video functions are legacy since they are not required
+
 func (c *YoutubeClient) FetchVideo(videoURL string) (map[string]interface{}, error) {
 	resp, err := http.Get(videoURL)
 	if err != nil {
@@ -124,7 +125,6 @@ func (c *YoutubeClient) FetchLatestVideoByChannel(channelID string) (string, err
 	return videoID, nil
 }
 
-// Channels
 func (c *YoutubeClient) FetchChannelName(channelId string) (string, error) {
 	paginatedVideos := c.ChannelInfoAPI(channelId)
 	resp, err := http.Get(paginatedVideos.String())

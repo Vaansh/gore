@@ -11,7 +11,9 @@ import (
 	"net"
 )
 
-func ConnectDb() (*sql.DB, error) {
+// Initialize db
+
+func InitDb() (*sql.DB, error) {
 	cfg := config.ReadDbConfig()
 
 	var (

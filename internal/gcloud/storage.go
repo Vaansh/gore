@@ -28,7 +28,7 @@ func NewStorageHandler() *StorageHandler {
 	cfg := config.ReadBucketConfig()
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(cfg.CredentialsPath))
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create service: %v", err)
 	}
 
 	return &StorageHandler{
@@ -42,11 +42,9 @@ func (fh *StorageHandler) UploadToBucket(fileName string) bool {
 	ctx := context.Background()
 	file, err := os.Open(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
-		//Log
 		log.Println(err)
 		return false
 	}
-	defer file.Close()
 
 	wc := fh.storageClient.Bucket(fh.bucketName).Object(fileName).NewWriter(ctx)
 	if _, err = io.Copy(wc, file); err != nil {
@@ -97,7 +95,6 @@ func (fh *StorageHandler) SaveYoutubeVideo(id string) bool {
 	if err != nil {
 		return false
 	}
-	defer file.Close()
 
 	_, err = io.Copy(file, stream)
 	if err != nil {
@@ -110,8 +107,9 @@ func (fh *StorageHandler) GetFileUrl(fileName string) string {
 	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", fh.bucketName, fileName)
 }
 
-func Delete(id string) {
-	err := os.Remove(fmt.Sprintf("%s/%s.mp4", DIRECTORY, id))
+func Delete(fileName string) {
+	err := os.Remove(fmt.Sprintf("%s/%s", DIRECTORY, fileName))
 	if err != nil {
+		log.Println(err)
 	}
 }

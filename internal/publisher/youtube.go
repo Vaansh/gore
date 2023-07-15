@@ -25,7 +25,7 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 	for {
 		posts, nextPageToken, err := p.client.FetchPaginatedShortsByChannel(p.channelId)
 		if err != nil {
-			log.Println("FetchPaginatedShortsByChannel err")
+			log.Println(err)
 		}
 
 		for _, post := range posts {
