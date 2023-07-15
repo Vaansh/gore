@@ -46,14 +46,14 @@ func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []gore.P
 		return fmt.Errorf("task already running for the given subscriber")
 	}
 
-	repo, err := repository.NewPostgresUserRepository(s.db, subscriberId, subscriberPlatform)
+	repo, err := repository.NewUserRepository(s.db, subscriberId, subscriberPlatform)
 	if err != nil {
 		return err
 	}
 
 	stop := make(chan struct{})
 
-	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, repo)
+	task := NewTask(publisherIds, publisherPlatforms, subscriberId, subscriberPlatform, metaData, *repo)
 	if task == nil {
 		return fmt.Errorf("invalid task configuration received")
 	}

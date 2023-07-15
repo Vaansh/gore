@@ -1,0 +1,31 @@
+name: CI/CD
+
+on: [pull_request]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t gore .
+
+      - name: Tag Docker image
+        run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
+
+      - name: Deploy to App Engine
+        uses: GoogleCloudPlatform/github-actions/app-engine-deploy@main
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          app_dir: /app
+          service: default
+          version: latest

@@ -35,8 +35,6 @@ func main() {
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
 	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
-	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
-	gcloud.LogInfo(fmt.Sprintf("Server listening on port %s\n", serverPort))
 	err := router.Run(":" + serverPort)
 	if err != nil {
 		gcloud.LogFatal(err.Error())
