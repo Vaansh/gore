@@ -10,6 +10,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Make envfile
+          uses: SpicyPizza/create-envfile@v2.0
+          with:
+            file_name: .env
+            envkey_INSTANCE_CONNECTION_NAME: ${{ secrets.INSTANCE_CONNECTION_NAME }}
+            envkey_DB_USER: ${{ secrets.DB_USER }}
+            envkey_DB_NAME: ${{ secrets.DB_NAME }}
+            envkey_DB_PASS: ${{ secrets.DB_PASS }}
+            envkey_GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+            envkey_BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+            envkey_LOCAL_LOG: "FALSE"
+            envkey_CLOUD_LOG: "TRUE" # only cloud logging is needed for the deployed app
+            envkey_LOG_NAME: ${{ secrets.LOG_NAME }}
+            envkey_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+            envkey_YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+            envkey_ACCESS_TOKEN:  ${{ secrets.ACCESS_TOKEN }}
+            envkey_SERVER_PORT: "8080"
+            envkey_API_AUTH_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
+
+      - name: Create Google Application Credentials file
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
