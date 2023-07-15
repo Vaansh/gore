@@ -56,6 +56,7 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
           export_default_credentials: true
+          install_components: 'gke-gcloud-auth-plugin'
 
       - name: Build Docker image
         run: docker build -t gore .
@@ -77,8 +78,6 @@ jobs:
           
       - name: Deploy to GKE
         run: |
-          gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
-          export USE_GKE_GCLOUD_AUTH_PLUGIN=True
           gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
 
           export DEPLOYMENT_NAME=${{ env.SERVICE }}-deployment
