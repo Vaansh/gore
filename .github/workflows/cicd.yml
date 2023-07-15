@@ -3,7 +3,7 @@ name: CICD
 on:
   push:
     branches:
-      - main
+      - '*'
   pull_request:
     types:
       - opened
@@ -12,7 +12,7 @@ on:
 env:
   SERVICE: gore
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGION: northamerica-northeast1 # Montreal server
+  REGION: us-central1
 
 jobs:
   cicd:
