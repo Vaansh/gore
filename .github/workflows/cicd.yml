@@ -77,6 +77,7 @@ jobs:
           
       - name: Deploy to GKE
         run: |
+          gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
           export USE_GKE_GCLOUD_AUTH_PLUGIN=True
           gcloud container clusters get-credentials ${{ env.SERVICE }} --zone ${{ env.REGION }} --project ${{ env.PROJECT_ID }}
 
