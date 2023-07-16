@@ -50,8 +50,7 @@ func UploadToBucket(fileName string) error {
 		return fmt.Errorf("io.Copy: %v", err)
 	}
 	if err := wc.Close(); err != nil {
-		//return fmt.Errorf("Writer.Close: %v", err)
-		LogFatal("s")
+		return fmt.Errorf("Writer.Close: %v", err)
 	}
 
 	return nil
