@@ -9,8 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
-	"net"
-	"os"
 )
 
 func main() {
@@ -42,9 +40,7 @@ func main() {
 	router.POST("/tasks/ig", taskHandler.RunInstagramTask)
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
-	fmt.Println(getLocalIP())
-
-	host := getLocalIP()
+	host := util.GetLocalIP()
 	gcloud.LogInfo(fmt.Sprintf("Server listening on: http://%s:%s\n", host, port))
 
 	err := router.Run(":" + port)
@@ -53,20 +49,3 @@ func main() {
 	}
 }
 
-func getLocalIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		fmt.Println("Error retrieving the local IP address:", err)
-		os.Exit(1)
-	}
-
-	for _, addr := range addrs {
-		ipNet, ok := addr.(*net.IPNet)
-		if ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
-			return ipNet.IP.String()
-		}
-	}
-
-	fmt.Println("Unable to find the local IP address.")
-	return ""
-}

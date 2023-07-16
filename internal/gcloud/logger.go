@@ -15,6 +15,14 @@ const (
 	LogDirectory = "log"
 )
 
+// Log levels constants
+const (
+	Info      = logging.Info
+	Error     = logging.Error
+	Warning   = logging.Warning
+	Emergency = logging.Emergency
+)
+
 var (
 	client      *logging.Client
 	cloudLogger *logging.Logger
@@ -25,12 +33,36 @@ var (
 	localErrorLogger   *log.Logger
 )
 
-// Helper function to create a new log file.
+// InitLogger Initializes the logger based on configuration
+func InitLogger() error {
+	cfg := config.ReadLoggerConfig()
+
+	if cfg.LocalLog {
+		err := initLocalLoggers()
+		if err != nil {
+			return err
+		}
+	}
+
+	if cfg.CloudLog {
+		ctx := context.Background()
+		var err error
+		client, err = logging.NewClient(ctx, cfg.ProjectId, option.WithCredentialsFile(cfg.CredentialsPath))
+		if err != nil {
+			return err
+		}
+		cloudLogger = client.Logger(cfg.LogName)
+	}
+
+	return nil
+}
+
+// Helper function to create a new log file
 func openLogFile(filename string) (*os.File, error) {
 	return os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 }
 
-// Initializes local loggers.
+// Initializes local loggers
 func initLocalLoggers() error {
 	currentTime := time.Now()
 	run := currentTime.Format("2006-01-02|3:4:5")
@@ -55,39 +87,7 @@ func initLocalLoggers() error {
 	return nil
 }
 
-// Log levels constants.
-const (
-	Info      = logging.Info
-	Error     = logging.Error
-	Warning   = logging.Warning
-	Emergency = logging.Emergency
-)
-
-// InitLogger Initializes the logger based on configuration.
-func InitLogger() error {
-	cfg := config.ReadLoggerConfig()
-
-	if cfg.LocalLog {
-		err := initLocalLoggers()
-		if err != nil {
-			return err
-		}
-	}
-
-	if cfg.CloudLog {
-		ctx := context.Background()
-		var err error
-		client, err = logging.NewClient(ctx, cfg.ProjectId, option.WithCredentialsFile(cfg.CredentialsPath))
-		if err != nil {
-			return err
-		}
-		cloudLogger = client.Logger(cfg.LogName)
-	}
-
-	return nil
-}
-
-// Logs to cloud logger.
+// Logs to cloud logger
 func cloudLog(severity logging.Severity, format string) {
 	if cloudLogger != nil {
 		logEntry := logging.Entry{
@@ -98,7 +98,7 @@ func cloudLog(severity logging.Severity, format string) {
 	}
 }
 
-// LogInfo logs info message to both local and cloud loggers.
+// LogInfo logs info message to both local and cloud loggers
 func LogInfo(format string) {
 	if localInfoLogger != nil {
 		localInfoLogger.Println(format)
@@ -109,7 +109,7 @@ func LogInfo(format string) {
 	}
 }
 
-// LogError logs error message to both local and cloud loggers.
+// LogError logs error message to both local and cloud loggers
 func LogError(format string) {
 	if localErrorLogger != nil {
 		localErrorLogger.Println(format)
@@ -120,7 +120,7 @@ func LogError(format string) {
 	}
 }
 
-// LogWarning logs warning message to both local and cloud loggers.
+// LogWarning logs warning message to both local and cloud loggers
 func LogWarning(format string) {
 	if localWarningLogger != nil {
 		localWarningLogger.Println(format)
@@ -131,7 +131,7 @@ func LogWarning(format string) {
 	}
 }
 
-// LogFatal logs fatal message to both local and cloud loggers.
+// LogFatal logs fatal message to both local and cloud loggers
 func LogFatal(format string) {
 	if localErrorLogger != nil {
 		localErrorLogger.Println(format)

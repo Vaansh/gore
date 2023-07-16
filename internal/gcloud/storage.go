@@ -39,15 +39,18 @@ func UploadToBucket(fileName string) error {
 	ctx := context.Background()
 	file, err := os.Open(fmt.Sprintf("%s/%s", LocalDataDirectory, fileName))
 	if err != nil {
+		fmt.Println("e")
 		return err
 	}
 
 	wc := storageClient.Bucket(bucketName).Object(fileName).NewWriter(ctx)
 	if _, err = io.Copy(wc, file); err != nil {
+		fmt.Println("f")
 		return err
 	}
 
 	if err := wc.Close(); err != nil {
+		fmt.Println("g")
 		return err
 	}
 
@@ -78,21 +81,28 @@ func SaveFile(id string, platform gore.Platform) error {
 		client := youtube.Client{}
 		videoLink, err := client.GetVideo(id)
 		if err != nil {
+			fmt.Println("a")
 			return err
 		}
 
 		formats := videoLink.Formats.WithAudioChannels()
 		stream, _, err := client.GetStream(videoLink, &formats[0])
 		if err != nil {
+			fmt.Println("b")
 			return err
 		}
 
 		file, err := os.Create(fmt.Sprintf("%s/yt_%s.mp4", LocalDataDirectory, id))
 		if err != nil {
+			fmt.Println("c")
 			return err
 		}
 
 		_, err = io.Copy(file, stream)
+		if err != nil {
+			fmt.Println("d")
+		}
+
 		return err // returns nil if no error
 	} else {
 		return fmt.Errorf("platform (%s) file saving not supported", platform)
