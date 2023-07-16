@@ -7,11 +7,17 @@ import (
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/util"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"log"
 	"net"
 	"os"
 )
 
 func main() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Println("Error loading environment variables file: missing or incorrect .env file")
+	}
+
 	if err := gcloud.InitLogger(); err != nil {
 		gcloud.LogFatal(fmt.Sprintf("Failed to initialize logger: %v", err))
 	}

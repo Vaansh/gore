@@ -3,7 +3,7 @@ name: CI/CD
 on:
   push:
     branches:
-      - '*'
+      - main
   pull_request:
     types:
       - closed
@@ -18,14 +18,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-#      - name: Check if PR was merged
-#        run: |
-#          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
-#            echo "PR was merged."
-#          else
-#            echo "PR was closed without merging."
-#            exit 0
-#          fi
+      - name: Check if PR was merged
+        run: |
+          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+            echo "PR was merged."
+          else
+            echo "PR was closed without merging."
+            exit 0
+          fi
 
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
