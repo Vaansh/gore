@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - '*'
-  pull_request:
-    types:
-      - closed
+#  pull_request:
+#    types:
+#      - closed
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -88,7 +88,6 @@ jobs:
           username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
           key: ${{ secrets.SSHKEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          envs: {{ secrets.DOCR_TOKEN }}, GITHUB_SHA
           script: |
             docker login -u ${{ secrets.DOCR_TOKEN }} -p ${{ secrets.DOCR_TOKEN }} registry.digitalocean.com
             docker stop gore
