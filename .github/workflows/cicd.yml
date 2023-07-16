@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types:
-      - closed
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -46,16 +43,6 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t gore .
-
-      # Deploy the docker image only if the PR was merged
-      - name: Check if PR was merged
-        run: |
-          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
-            echo "PR was merged."
-          else
-            echo "PR was closed without merging."
-            exit 1
-          fi
 
       # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
       - name: Tag Docker image for Docker Hub

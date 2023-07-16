@@ -14,6 +14,7 @@ import (
 type InstagramSubscriber struct {
 	instagramId string
 	hashtags    string
+	frequency   time.Duration
 	repository  repository.UserRepository
 	client      *http.InstagramClient
 }
@@ -22,6 +23,7 @@ func NewInstagramSubscriber(instagramId string, metadata model.MetaData, reposit
 	return &InstagramSubscriber{
 		instagramId: instagramId,
 		hashtags:    metadata.IgPostTags,
+		frequency:   metadata.Frequency,
 		repository:  repository,
 		client:      http.NewInstagramClient(metadata.IgUserId, metadata.IgLongLivedAccessToken),
 	}
@@ -37,7 +39,6 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 
 		if !exists {
 			err := gcloud.SaveFile(postId, sourcePlatform)
-
 			if err != nil {
 				gcloud.LogError(err.Error())
 				break
@@ -69,7 +70,7 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 			}
 
 			gcloud.DeleteFile(fileName)
-			time.Sleep(30 * time.Minute)
+			time.Sleep(s.frequency)
 		}
 	}
 }

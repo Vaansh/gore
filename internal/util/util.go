@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"regexp"
 	"strings"
@@ -14,6 +15,24 @@ func Getenv(k string, mustGet bool) string {
 		log.Fatalf(fmt.Sprintf("Fatal Error: %s environment variable not set.\n", k))
 	}
 	return v
+}
+
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		fmt.Println("Error retrieving the local IP address:", err)
+		os.Exit(1)
+	}
+
+	for _, addr := range addrs {
+		ipNet, ok := addr.(*net.IPNet)
+		if ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
+			return ipNet.IP.String()
+		}
+	}
+
+	fmt.Println("Unable to find the local IP address.")
+	return ""
 }
 
 func Contains(slice []string, item string) bool {
