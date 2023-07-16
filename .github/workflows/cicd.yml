@@ -52,7 +52,7 @@ jobs:
             echo "PR was merged."
           else
             echo "PR was closed without merging."
-            exit 0
+            exit 1
           fi
 
       # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
