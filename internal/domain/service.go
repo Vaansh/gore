@@ -48,7 +48,7 @@ func (s *TaskService) RunTask(publisherIds []string, publisherPlatforms []gore.P
 
 	repo, err := repository.NewUserRepository(s.db, subscriberId, subscriberPlatform)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not perform repository.NewUserRepository(%s, %s): ", subscriberId, subscriberPlatform)
 	}
 
 	stop := make(chan struct{})

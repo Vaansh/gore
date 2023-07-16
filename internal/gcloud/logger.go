@@ -70,19 +70,19 @@ func initLocalLoggers() error {
 	if err != nil {
 		return err
 	}
-	localInfoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	localInfoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime)
 
 	file, err = openLogFile(fmt.Sprintf("%s/%s-%s.log", LogDirectory, "warning", run))
 	if err != nil {
 		return err
 	}
-	localWarningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+	localWarningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime)
 
 	file, err = openLogFile(fmt.Sprintf("%s/%s-%s.log", LogDirectory, "error", run))
 	if err != nil {
 		return err
 	}
-	localErrorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	localErrorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime)
 
 	return nil
 }
