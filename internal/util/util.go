@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"regexp"
@@ -10,10 +9,6 @@ import (
 )
 
 func Getenv(k string, mustGet bool) string {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading environment variables file")
-	}
-
 	v := os.Getenv(k)
 	if mustGet && v == "" {
 		log.Fatalf(fmt.Sprintf("Fatal Error: %s environment variable not set.\n", k))
