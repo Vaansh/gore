@@ -17,22 +17,20 @@ func Getenv(k string, mustGet bool) string {
 	return v
 }
 
-func GetLocalIP() string {
+func GetLocalIP() (string, error) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		fmt.Println("Error retrieving the local IP address:", err)
-		os.Exit(1)
+		return "", fmt.Errorf("error retrieving the local IP address: %w", err)
 	}
 
 	for _, addr := range addrs {
 		ipNet, ok := addr.(*net.IPNet)
 		if ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
-			return ipNet.IP.String()
+			return ipNet.IP.String(), nil
 		}
 	}
 
-	fmt.Println("Unable to find the local IP address.")
-	return ""
+	return "", fmt.Errorf("unable to find the local IP address")
 }
 
 func Contains(slice []string, item string) bool {

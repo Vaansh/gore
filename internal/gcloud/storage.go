@@ -47,10 +47,11 @@ func UploadToBucket(fileName string) error {
 
 	wc := storageClient.Bucket(bucketName).Object(fileName).NewWriter(ctx)
 	if _, err := io.Copy(wc, file); err != nil {
-		return fmt.Errorf("io.Copy: %v", err)
+		return fmt.Errorf("io.Copy: %w source: %s", err, "storage bucket")
 	}
+
 	if err := wc.Close(); err != nil {
-		return fmt.Errorf("Writer.Close: %v", err)
+		return fmt.Errorf("Writer.Close: %w source: %s", err, "storage bucket")
 	}
 
 	return nil
@@ -96,7 +97,7 @@ func SaveFile(id string, platform gore.Platform) error {
 
 		_, err = io.Copy(file, stream)
 		if err != nil {
-			return fmt.Errorf("io.Copy: %w", err)
+			LogInfo(fmt.Sprintf("io.Copy: %s source: %s", err, "youtube downloader client"))
 		}
 
 		return nil

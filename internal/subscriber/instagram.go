@@ -1,6 +1,7 @@
 package subscriber
 
 import (
+	"fmt"
 	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/http"
@@ -70,6 +71,7 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 			}
 
 			gcloud.DeleteFile(fileName)
+			gcloud.LogInfo(fmt.Sprintf("Instagram subscriber (%s) processed post %s from %s", s.GetSubscriberId(), post.PostId, sourcePlatform))
 			time.Sleep(s.frequency)
 		}
 	}
