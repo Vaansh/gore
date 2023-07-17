@@ -5,7 +5,6 @@ import (
 	"github.com/Vaansh/gore/internal/http"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/util"
-	"time"
 )
 
 type YoutubePublisher struct {
@@ -39,8 +38,6 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 		if nextPageToken == "" {
 			break
 		}
-
-		time.Sleep(10 * time.Second)
 	}
 
 	var videosBuffer []string
@@ -62,8 +59,6 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 		if len(videosBuffer) == 50 {
 			videosBuffer = make([]string, 0)
 		}
-
-		time.Sleep(10 * time.Second)
 	}
 }
 

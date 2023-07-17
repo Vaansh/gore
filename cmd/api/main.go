@@ -40,10 +40,14 @@ func main() {
 	router.POST("/tasks/ig", taskHandler.RunInstagramTask)
 	router.DELETE("/tasks/:platform/:id", taskHandler.StopTask)
 
-	host := util.GetLocalIP()
+	host, err := util.GetLocalIP()
+	if err != nil {
+		gcloud.LogWarning(err.Error())
+	}
+
 	gcloud.LogInfo(fmt.Sprintf("Server listening on: http://%s:%s\n", host, port))
 
-	err := router.Run(":" + port)
+	err = router.Run(":" + port)
 	if err != nil {
 		gcloud.LogFatal(err.Error())
 	}
