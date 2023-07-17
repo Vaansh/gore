@@ -9,6 +9,7 @@ import (
 	"github.com/Vaansh/gore/internal/repository"
 	"github.com/Vaansh/gore/internal/subscriber"
 	"reflect"
+	"strings"
 	"sync"
 )
 
@@ -59,7 +60,11 @@ func (t *Task) Run(stop chan struct{}) {
 	wg.Add(len(t.Publishers))
 
 	for _, p := range t.Publishers {
-		gcloud.LogInfo(fmt.Sprintf("%s (id: %s) has started publishing for task %s", reflect.TypeOf(p), p.GetPublisherId(), t.Id))
+		publisherName := reflect.TypeOf(p).String()
+		if i := strings.Index(publisherName, "."); i != -1 {
+			publisherName = publisherName[i+1:]
+		}
+		gcloud.LogInfo(fmt.Sprintf("%s (id: %s) has started publishing for task %s", publisherName, p.GetPublisherId(), t.Id))
 		go func(publisher publisher.Publisher) {
 			defer wg.Done()
 			publisher.PublishTo(c, t.Quit)
