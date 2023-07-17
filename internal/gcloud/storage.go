@@ -97,7 +97,7 @@ func SaveFile(id string, platform gore.Platform) error {
 
 		_, err = io.Copy(file, stream)
 		if err != nil {
-			return fmt.Errorf("io.Copy: %w", err)
+			LogInfo(fmt.Sprintf("io.Copy: %s source: %s", err, "youtube downloader client"))
 		}
 
 		return nil
