@@ -8,7 +8,7 @@
 
 <!-- HEADERS -->
 <p align="center">
-	<a href="https://github.com/Vaansh/gore/graphs/contributors">
+	<a href="https://github.com/Vaansh/gore/actions/workflows/cicd.yml">
 	<img src="https://img.shields.io/github/actions/workflow/status/Vaansh/gore/cicd.yml?branch=main&logo=github&style=for-the-badge">
 	</a>
 	<a href="https://github.com/Vaansh/gore/blob/main/LICENSE">
@@ -46,10 +46,6 @@
 		</li>
 		<li>
 			<a href="#system-design">System Design</a>
-			<ul>
-				<li><a href="#core-application-logic">Core Application Logic</a>
-				</li>
-			</ul>
 		</li>
 		<li>
 			<a href="#overall-system-architecture">Overall System Architecture</a>
@@ -57,7 +53,7 @@
 				<li><a href="#persistence-with-postgresql">Persistence with PostgreSQL</a></li>
 				<li><a href="#cloud-bucket-storage">Cloud Bucket Storage</a></li>
 				<li><a href="#cloud-and-local-logging">Cloud and Local Logging</a></li>
-				<li><a href="#web-api">Web API with Gin</a></li>
+				<li><a href="#web-api-with-gin">Web API with Gin</a></li>
 			</ul>
 		</li>
 		<li><a href="#deployment">Deployment</a></li>
@@ -185,7 +181,7 @@ A sample `DELETE` request to `tasks/:platform/:id`
 The only way to make changes to the `main` branch is by opening PRs. Once a PR is merged, the docker image builds, and if succesful, is moved to the DigitalOcean container registry which serves as the main hosting place for my artifacts. I also publish this as a private image on DockerHub, for my own future reference. The flow described is displayed in the image below.
 
 <p align="center">
-	<img src="https://i.imgur.com/hrzBaFf.jpg">
+	<img src="https://i.imgur.com/3AdgKJl.jpg">
 </p>
 
 ### GitHub Actions
@@ -228,7 +224,7 @@ There are certain things I wanted to discuss but didn't fit into any of these to
 
 ### Future Plans
 
-The project page is always up to track the [status](https://github.com/users/Vaansh/projects/1).
+The [project page](https://github.com/users/Vaansh/projects/1) is the best way to track future plans and current progress of the project.
 
 <p align="center">
 	<img src="https://raw.githubusercontent.com/gist/brudnak/6c21505423e4ff089ab704ec79b5a096/raw/b2d3dec32474b2121b179920734b259323a7c250/go.gif" height="120">
