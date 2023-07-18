@@ -99,7 +99,7 @@ A few years ago I wrote a few scripts to automate posting content from Reddit to
 
 ## System Design
 
-A `Task` makes up the basic structure of my application. It is defined as follows and consists of many publishers and one subscriber. Channels in Go seemed like the right message passing system to start with (it gave me the pub-sub mechanism I was looking for to implement something like this). Every task when created, has its own channel where the publishers write and subsciber consumes – making each component responsible for their own fetching or posting mechanism – allowing for separation of concerns.
+A `Task` makes up the basic structure of my application. It is defined as follows and consists of many publishers and one subscriber. Channels in Go seemed like the right message passing system to start with (it gave me the pub-sub mechanism I was looking for to implement something like this). Every task when created, has its own channel where the publishers write and subscriber consumes – making each component responsible for their own fetching or posting mechanism – allowing for separation of concerns.
 
 ```go
 type Task struct {
@@ -110,7 +110,7 @@ type Task struct {
 }
 ```
 
-It has a `Run()` method which starts a goroutine for every publisher (that publish posts to the channel) and the subscirber (which subscribes to this channel and is responsible for ensuring: (1) ensuring uniqueness of the post (2), storing the file locally, uploading it to a cloud storage, (3) deleting them from both after posting it to the desired platform, and (4) ensuring it maintains a certain posting frequency). The definition of Publisher and Subscriber are outlined below for reference.
+It has a `Run()` method which starts a goroutine for every publisher (that publish posts to the channel) and the subscirber (which subscribes to this channel and is responsible for ensuring: (1) ensuring uniqueness of the post (2), storing the file locally, (3) uploading it to a cloud storage, (4) deleting them from both after posting it to the desired platform, and (5) ensuring it maintains a certain posting frequency). The definition of Publisher and Subscriber are outlined below for reference.
 
 ```go
 type Publisher interface {
@@ -126,14 +126,14 @@ type Subscriber interface {
 
 _NOTE:_ As of now, YouTube is the only kind of publisher and Instagram is the only kind of subscriber that is supported. Please follow the rest of the document with that in mind.
 
-There is also a `Quit` channel that simply exists for force quitting a task, this is for use by the `TaskService`. It is the service responsible for managing the lifecycle of each task by maintaing a map for the tasks currently running and the quit channel to invoke, if the task should be stopped.
+There is also a `Quit` channel that simply exists for force quitting a task, this is for use by the `TaskService`. It is the service responsible for managing the lifecycle of all tasks by maintaing a map for the tasks currently running and the quit channel to invoke, if the task should be stopped.
 
 ## Overall System Architecture
 
 With the main application logic out of the way, I'll cover the entire software architecture from a higher level. Below is the overall workflow of the project in its current state. Each component if briefly talked about below.
 
 <p align="center">
-	<img src="https://i.imgur.com/hIDl8D2.png">
+	<img src="https://i.imgur.com/mFNZSkN.png">
 </p>
 
 ### Persistence with PostgreSQL
@@ -227,7 +227,7 @@ There are certain things I wanted to discuss but didn't fit into any of these to
 The [project page](https://github.com/users/Vaansh/projects/1) is the best way to track future plans and current progress of the project.
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/gist/brudnak/6c21505423e4ff089ab704ec79b5a096/raw/b2d3dec32474b2121b179920734b259323a7c250/go.gif" height="120">
+	<img src="https://raw.githubusercontent.com/gist/brudnak/6c21505423e4ff089ab704ec79b5a096/raw/b2d3dec32474b2121b179920734b259323a7c250/go.gif" height="120" width="180">
 </p>
 
 Overall, I need to add unit tests (and run it on PRs), and I think I can to a better job with logging. But there are still a lot of other platforms I need to implement – for both publishers and subscribers.
