@@ -3,11 +3,12 @@ package domain
 import (
 	"database/sql"
 	"fmt"
+	"sync"
+
 	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/Vaansh/gore/internal/repository"
-	"sync"
 )
 
 // Task service is a singleton

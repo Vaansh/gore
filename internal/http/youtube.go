@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Vaansh/gore"
-	"github.com/Vaansh/gore/internal/model"
 	"net/http"
 	"net/url"
+
+	"github.com/Vaansh/gore"
+	"github.com/Vaansh/gore/internal/model"
 )
 
 type YoutubeClient struct {

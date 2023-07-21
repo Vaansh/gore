@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/Vaansh/gore/internal/util"
 	"strings"
+
+	"github.com/Vaansh/gore/internal/util"
 )
 
 type LoggerConfig struct {

@@ -2,8 +2,9 @@ package http
 
 import (
 	"fmt"
-	fb "github.com/huandu/facebook/v2"
 	"time"
+
+	fb "github.com/huandu/facebook/v2"
 )
 
 type InstagramClient struct {

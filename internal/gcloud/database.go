@@ -1,14 +1,15 @@
 package gcloud
 
 import (
-	"cloud.google.com/go/cloudsqlconn"
 	"context"
 	"database/sql"
 	"fmt"
+	"net"
+
+	"cloud.google.com/go/cloudsqlconn"
 	"github.com/Vaansh/gore/internal/config"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
-	"net"
 )
 
 // Initialize db

@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/Vaansh/gore/internal/api"
 	"github.com/Vaansh/gore/internal/domain"
 	"github.com/Vaansh/gore/internal/gcloud"
 	"github.com/Vaansh/gore/internal/util"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"log"
 )
 
 func main() {
@@ -52,4 +53,3 @@ func main() {
 		gcloud.LogFatal(err.Error())
 	}
 }
-

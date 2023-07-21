@@ -1,9 +1,10 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/Vaansh/gore/internal/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func AuthMiddleware(c *gin.Context) {

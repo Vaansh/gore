@@ -5,24 +5,26 @@ on:
     branches:
       - main
 
+# Environment variables local to this file
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   IMAGE_NAME: gore
 
 jobs:
+  # Build and push Docker image job
   build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # In order for the docker image we build to have the .env variables and credentials
+      # Create .env file for the Docker image
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
         with:
           file_name: .env
-          envkey_PROJECT_ID: ${{ secrets.PROJECT_ID }}
           envkey_INSTANCE_CONNECTION_NAME: ${{ secrets.INSTANCE_CONNECTION_NAME }}
+          envkey_PROJECT_ID: ${{ secrets.PROJECT_ID }}
           envkey_DB_USER: ${{ secrets.DB_USER }}
           envkey_DB_NAME: ${{ secrets.DB_NAME }}
           envkey_DB_PASS: ${{ secrets.DB_PASS }}
@@ -35,41 +37,34 @@ jobs:
           envkey_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           envkey_API_AUTH_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
 
+      # Create credentials JSON file
       - name: Create credentials json file
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
 
-      - name: Build Docker image
-        run: docker build -t gore .
+      # Build the Docker image and push to Docker Hub
+      - name: Build and Push Docker image to Docker Hub
+        run: |
+          docker build -t gore .
+          docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
 
-      # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
-      - name: Tag Docker image for Docker Hub
-        run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
-
-      - name: Push Docker image to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
-
-      # Push Docker image to DigitalOcean Container Registry
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DOCR_TOKEN }}
-
-      - name: Log in to DigitalOcean Container Registry
-        run: doctl registry login --expiry-seconds 600
-
-      - name: Tag Docker image for DigitalOcean Container Registry
-        run: docker tag gore:latest registry.digitalocean.com/gore/gore:latest
-
+      # Authenticate and push the Docker image to DigitalOcean Container Registry
       - name: Push Docker image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/gore/gore:latest
+        run: |
+          doctl registry login --expiry-seconds 600
+          docker tag gore:latest registry.digitalocean.com/gore/gore:latest
+          docker push registry.digitalocean.com/gore/gore:latest
 
+  # Deploy job
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
     steps:
+      # SSH into instance, remove current instance, and start the newest image after pulling it from the registry
       - name: Deploy to Digital Ocean droplet via SSH action
         uses: appleboy/ssh-action@v0.1.10
         with:

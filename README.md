@@ -14,9 +14,6 @@
 	<a href="https://github.com/Vaansh/gore/blob/main/LICENSE">
 	<img src="https://img.shields.io/github/license/gatsbyjs/gatsby.svg?style=for-the-badge">
 	</a>
-	<a href="https://linkedin.com/in/Vaansh">
-	<img src="https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555">
-	</a>
 </p>
 
 <!-- PROJECT LOGO -->
@@ -213,7 +210,7 @@ Another one for building and pushing the docker image to the registry, acting as
 I tried Google Cloud Run, Kubernetes, & Compute Engine but nothing really suited what I was looking for. I decided to go with another platform and created a Droplet (VM) on DigitalOcean. I really liked my experience with DigitalOcean so far, it gave me a streamlined developer solution I was looking for.
 
 <p align="center">
-	<img src="https://i.imgur.com/XIireVV.jpg">
+	<img src="https://i.imgur.com/zGEWBkS.jpeg">
 </p>
 
 <!-- Miscellaneous -->
