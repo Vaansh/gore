@@ -1,11 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/domain"
 	"github.com/Vaansh/gore/internal/model"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type TaskHandler struct {

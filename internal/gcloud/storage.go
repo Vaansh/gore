@@ -1,16 +1,17 @@
 package gcloud
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
+	"io"
+	"os"
+	"time"
+
+	"cloud.google.com/go/storage"
 	"github.com/Vaansh/gore"
 	"github.com/Vaansh/gore/internal/config"
 	"github.com/kkdai/youtube/v2"
 	"google.golang.org/api/option"
-	"io"
-	"os"
-	"time"
 )
 
 var (
