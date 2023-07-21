@@ -19,8 +19,8 @@ func NewInstagramClient(userId, accessToken string) *InstagramClient {
 	}
 }
 
-func (c *InstagramClient) UploadReel(videoUrl, caption string) error {
-	containerId, err := c.createReelsContainer(videoUrl, caption)
+func (c *InstagramClient) UploadReel(videoUrl, coverUrl, caption string) error {
+	containerId, err := c.createReelsContainer(videoUrl, coverUrl, caption)
 	if err != nil {
 		return err
 	}
@@ -38,13 +38,26 @@ func (c *InstagramClient) UploadReel(videoUrl, caption string) error {
 	return nil
 }
 
-func (c *InstagramClient) createReelsContainer(videoUrl, caption string) (string, error) {
-	res, err := fb.Post(c.userId+"/media", fb.Params{
-		"media_type":   "REELS",
-		"video_url":    videoUrl,
-		"caption":      caption,
-		"access_token": c.accessToken,
-	})
+func (c *InstagramClient) createReelsContainer(videoUrl, coverUrl, caption string) (string, error) {
+	var res fb.Result
+	var err error
+
+	if coverUrl == "" {
+		res, err = fb.Post(c.userId+"/media", fb.Params{
+			"media_type":   "REELS",
+			"video_url":    videoUrl,
+			"caption":      caption,
+			"access_token": c.accessToken,
+		})
+	} else {
+		res, err = fb.Post(c.userId+"/media", fb.Params{
+			"media_type":   "REELS",
+			"video_url":    videoUrl,
+			"caption":      caption,
+			"cover_url":    coverUrl,
+			"access_token": c.accessToken,
+		})
+	}
 
 	if err != nil {
 		return "", err

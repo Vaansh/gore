@@ -46,6 +46,11 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 				break
 			}
 
+			coverUrl, err := gcloud.GetCoverUrl(postId, sourcePlatform)
+			if err != nil {
+				gcloud.LogWarning(err.Error())
+			}
+
 			fileName := sourcePlatform.String() + "_" + postId + ".mp4"
 			err = gcloud.UploadToBucket(fileName)
 			if err != nil {
@@ -54,7 +59,7 @@ func (s *InstagramSubscriber) SubscribeTo(c <-chan model.Post) {
 			}
 
 			fileUrl := gcloud.GetFileUrl(fileName)
-			err = s.client.UploadReel(fileUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
+			err = s.client.UploadReel(fileUrl, coverUrl, util.GenerateInstagramCaption(caption, author, s.hashtags, strings.ToUpper(sourcePlatform.String())))
 			if err != nil {
 				gcloud.LogError(err.Error())
 				break

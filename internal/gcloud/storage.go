@@ -107,6 +107,14 @@ func SaveFile(id string, platform gore.Platform) error {
 	}
 }
 
+func GetCoverUrl(id string, platform gore.Platform) (string, error) {
+	if platform == gore.YOUTUBE {
+		return fmt.Sprintf("https://img.youtube.com/vi/%s/0.jpg\n", id), nil
+	} else {
+		return "", fmt.Errorf("platform (%s) file saving not supported", platform)
+	}
+}
+
 func DeleteFile(fileName string) {
 	err := os.Remove(fmt.Sprintf("%s/%s", LocalDataDirectory, fileName))
 	if err != nil {
