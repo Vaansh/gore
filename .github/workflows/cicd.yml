@@ -1,5 +1,6 @@
 name: CI/CD
 
+# Define when the CI/CD pipeline should run, in this case, it triggers on every push to the main branch.
 on:
   push:
     branches:
@@ -10,15 +11,16 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   IMAGE_NAME: gore
 
+# Define the jobs that make up the CI/CD pipeline
 jobs:
-  # Build and push Docker image job
+  # Job for building and pushing the Docker image
   build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Create .env file for the Docker image
+      # In order for the docker image we build to have the .env variables file
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
         with:
@@ -37,34 +39,49 @@ jobs:
           envkey_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           envkey_API_AUTH_TOKEN: ${{ secrets.API_AUTH_TOKEN }}
 
-      # Create credentials JSON file
+      # In order for the docker image we build to have the credentials file
       - name: Create credentials json file
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
 
-      # Build the Docker image and push to Docker Hub
-      - name: Build and Push Docker image to Docker Hub
-        run: |
-          docker build -t gore .
-          docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
+      # Build the docker image
+      - name: Build Docker image
+        run: docker build -t gore .
 
-      # Authenticate and push the Docker image to DigitalOcean Container Registry
+      # Tag the image for Docker Hub
+      - name: Tag Docker image for Docker Hub
+        run: docker tag gore ${{ secrets.DOCKER_USERNAME }}/gore:latest
+
+      # Push Docker image to Docker Hub (it is a private image, hosted there for my own reference)
+      - name: Push Docker image to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push ${{ secrets.DOCKER_USERNAME }}/gore:latest
+
+      # Install doctl CLI (DigitalOcean command-line tool)
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DOCR_TOKEN }}
+
+      # Authenticate to DigitalOcean Container Registry
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      # Tag the image for DigitalOcean Container Registry
+      - name: Tag Docker image for DigitalOcean Container Registry
+        run: docker tag gore:latest registry.digitalocean.com/gore/gore:latest
+
+      # Push Docker image to DigitalOcean Container Registry
       - name: Push Docker image to DigitalOcean Container Registry
-        run: |
-          doctl registry login --expiry-seconds 600
-          docker tag gore:latest registry.digitalocean.com/gore/gore:latest
-          docker push registry.digitalocean.com/gore/gore:latest
+        run: docker push registry.digitalocean.com/gore/gore:latest
 
-  # Deploy job
+  # Job for deploying the Docker image to a Digital Ocean droplet
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
     steps:
-      # SSH into instance, remove current instance, and start the newest image after pulling it from the registry
+      # SSH into the instance, remove the current instance, and start the newest image after pulling it from the registry
       - name: Deploy to Digital Ocean droplet via SSH action
         uses: appleboy/ssh-action@v0.1.10
         with:
