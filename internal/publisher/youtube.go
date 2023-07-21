@@ -56,7 +56,7 @@ func (p *YoutubePublisher) PublishTo(c chan<- model.Post, quit <-chan struct{}) 
 			}
 		}
 
-		if len(videosBuffer) == 50 {
+		if len(videosBuffer) == 100 {
 			videosBuffer = make([]string, 0)
 		}
 	}
