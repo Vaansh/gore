@@ -1,8 +1,10 @@
 name: CI/CD
 
-# Define when the CI/CD pipeline should run, in this case, it triggers on every push to the main branch.
+# Define when the CI/CD pipeline should run, in this case, it triggers when PRs to the main branch are closed.
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
 
