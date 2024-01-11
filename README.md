@@ -8,10 +8,10 @@
 
 <!-- HEADERS -->
 <p align="center">
-	<a href="https://github.com/Vaansh/gore/actions/workflows/cicd.yml">
-	<img src="https://img.shields.io/github/actions/workflow/status/Vaansh/gore/cicd.yml?branch=main&logo=github&style=for-the-badge">
+	<a href="https://github.com/Vaansh/gorepost/actions/workflows/cicd.yml">
+	<img src="https://img.shields.io/github/actions/workflow/status/Vaansh/gorepost/cicd.yml?branch=main&logo=github&style=for-the-badge">
 	</a>
-	<a href="https://github.com/Vaansh/gore/blob/main/LICENSE">
+	<a href="https://github.com/Vaansh/gorepost/blob/main/LICENSE">
 	<img src="https://img.shields.io/github/license/gatsbyjs/gatsby.svg?style=for-the-badge">
 	</a>
 </p>
@@ -19,14 +19,14 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-	<a href="https://github.com/Vaansh/gore">
+	<a href="https://github.com/Vaansh/gorepost">
 	<img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Go_gopher_favicon.svg" alt="Logo" height="120">
 	</a>
-<h3 align="center">GoRe</h3>
+<h3 align="center">GoRepost</h3>
 <p align="center">
 	A Content Resharing Engine Written in Go.
 	<br />
-	<a href="https://github.com/Vaansh/gore"><strong>Explore the docs »</strong></a>
+	<a href="https://github.com/Vaansh/gorepost"><strong>Explore the docs »</strong></a>
 	<br />
 	<br />
 </p>
@@ -66,7 +66,6 @@
 		<ul>
 			<li><a href="#future-plans">Future Plans</a></li>
 			<li><a href="#environment-variables">Environment Variables</a></li>
-			<li><a href="#directory-structure">Directory Structure</a></li>
 		</ul>
 		</li>
 		<li><a href="#license">License</a></li>
@@ -234,71 +233,6 @@ My application is also quite stateful, which might be something I would want to 
 ### Environment Variables
 
 All required environment variables so far can be seen in the `.env-sample` file. (PS: having the actual file is not necessary, I just use it so I have my secrets in one place but you can just set those environment variables directly). For obvious reasons, the actual variables file itself isn't tracked and I generate it throguh GitHub actions – this way I don't have to set them each time I change the machine I deploy them on. But it also means my docker image must remain priavte so I ensure no one has access to my containers. Also there is a sample service account key credentials JSON file that is needed for accessing various GCP services through client libraries.
-
-### Directory Structure
-
-This is my overall directory structure with a brief explanation of each.
-
-```sh
-.
-├── .github                     # everything github related
-│   ├── workflows               # all my workflows
-│   │   ├── cicd.yml            # building and deploying action file
-│   │   ├── reviewdog.yml       # pr linting action file
-├── Dockerfile                  # used to create docker image
-├── LICENSE                     # software license
-├── README.md                   # documentation
-├── cmd                         # all main programs live here
-│   └── api                     # api directory containing main program
-│       └── main.go             # the main program
-├── data                        # directory used to store .mp4 files locally
-├── gcloud-key.json             # sample service key credentials
-├── go.mod                      # all project dependenciess
-├── go.sum                      # go module checksum file
-├── internal                    # all application specific logic
-│   ├── api                     # everything related to the api
-│   │   ├── handler.go          # api handlers
-│   │   ├── middleware.go       # authorization middleware
-│   │   ├── request.go          # request dtos
-│   │   └── response.go         # response dtos
-│   ├── config                  # all my config files
-│   │   ├── database.go         # reads and creates database config
-│   │   ├── logger.go           # reads and creates logger config
-│   │   └── storage.go          # reads and creates logger config
-│   ├── domain                  # the core of my application
-│   │   ├── service.go          # task service
-│   │   └── task.go             # definiton and task behaviour
-│   ├── gcloud                  # gcp module
-│   │   ├── database.go         # functions for cloud database
-│   │   ├── logger.go           # functions for cloud logger
-│   │   └── storage.go          # functions for cloud bucket storage
-│   ├── http                    # all my http clients
-│   │   ├── client.go           # general client definition
-│   │   ├── instagram.go        # instagram platform client
-│   │   └── youtube.go          # youtube platform client
-│   ├── model                   # all models used in my application
-│   │   ├── metadata.go         # metadata used for things like scheduling
-│   │   ├── post.go             # model defining post
-│   │   └── user.go             # model defining user (subscriber)
-│   ├── publisher               # all publisher logic
-│   │   ├── publisher.go        # general publisher interface
-│   │   └── youtube.go          # youtube publisher implementation
-│   ├── repository              # for all database operations
-│   │   └── user.go             # user repository operations
-│   ├── subscriber              # general subscriber interface
-│   │   ├── instagram.go        # instagram subscriber implementation
-│   │   └── subscriber.go       # general subscriber interface
-│   └── util                    # util module
-│       └── util.go             # all my helper functions
-├── log                         # local log directory
-│   ├── error.log               # sample error log file
-│   ├── info.log                # sample info log file
-│   └── warning.log             # sample warning log file
-├── scripts                     # a bunch of simple scripts I use often
-│   ├── clean.sh                # deletes all log and data files
-│   └── run.sh                  # builds and runs cmd/api/main.go
-├── supported.go                # a centralized list of supported platforms
-```
 
 ## License
 
